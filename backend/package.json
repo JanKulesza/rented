@@ -1,0 +1,16 @@
+{
+  "name": "redesign-backend",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "node --experimental-transform-types --watch index.ts",
+    "lint": "npx eslint"
+  },
+  "devDependencies": {
+    "eslint": "^9.23.0",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.29.0"
+  }
+}
