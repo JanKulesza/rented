@@ -2,11 +2,14 @@ import "./utils/config.ts";
 import express from "express";
 import { handleError } from "./middlewares/error.ts";
 import connectDB from "./utils/db.ts";
+import setupRoutes from "./routes/index.ts";
 
 export const app = express();
 
 // Middlewares
 app.use(express.json());
+
+setupRoutes(app);
 
 // Error handler
 app.use(handleError);
