@@ -6,6 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-main: 0 0% 96%;
+  --color-theme: 233 81% 60%;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -44,9 +46,9 @@
 }
 
 :root {
+  --background: 0 0% 99%;
+  --foreground: 240 5.3% 26.1%;
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -110,6 +112,16 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer utilities {
+  .bg-theme {
+    background-color: hsl(var(--theme));
+  }
+  .text-theme {
+    color: hsl(var(--theme));
+  }
+  /* Repeat for other variables */
 }
 
 @layer base {
