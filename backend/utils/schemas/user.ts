@@ -1,7 +1,7 @@
 import { z } from "zod";
-import User from "../../models/user.ts";
 import mongoose from "mongoose";
 import Agency from "../../models/agency.ts";
+import Property from "../../models/property.ts";
 
 export const userSchema = z.object({
   firstName: z
@@ -12,8 +12,7 @@ export const userSchema = z.object({
     .min(3, "Invalid last name."),
   email: z
     .string({ required_error: "Email is required." })
-    .email("Invalid email.")
-    .refine(async (arg) => !!(await User.findOne({ email: arg }))),
+    .email("Invalid email."),
   password: z
     .string({ required_error: "Password is required." })
     .min(6, "Password must be at least 8 characters long."),
@@ -23,7 +22,18 @@ export const userSchema = z.object({
     .refine(async (arg) => {
       if (!mongoose.isValidObjectId(arg)) return false;
       return !!(await Agency.findById(arg));
-    }, "Invalid agency id."),
+    }, "Invalid agency id.")
+    .optional(),
+  properties: z
+    .array(z.string({ required_error: "Properties are required." }))
+    .refine(async (args) => {
+      if (args.length === 0) return true;
+      for (const arg of args) {
+        if (!mongoose.isValidObjectId(arg)) return false;
+        return !!(await Property.findById(arg));
+      }
+    }, "Invalid property id.")
+    .optional(),
 });
 
 export type UserSchemaType = z.infer<typeof userSchema>;

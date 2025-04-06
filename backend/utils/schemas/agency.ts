@@ -12,7 +12,7 @@ export const agencySchema = z.object({
     .string({ required_error: "Owner is required." })
     .refine(async (arg) => {
       if (!mongoose.isValidObjectId(arg)) return false;
-      return !!(await User.findById(arg));
+      else return true;
     }, "Invalid owner id."),
   agents: z
     .array(z.string(), { required_error: "Agents are required." })
@@ -22,7 +22,8 @@ export const agencySchema = z.object({
         if (!mongoose.isValidObjectId(arg)) return false;
         return !!(await User.findById(arg));
       }
-    }, "Invalid agent id."),
+    }, "Invalid agent id.")
+    .optional(),
   properties: z
     .array(z.string(), { required_error: "Properties are required." })
     .refine(async (args) => {
@@ -31,7 +32,8 @@ export const agencySchema = z.object({
         if (!mongoose.isValidObjectId(arg)) return false;
         return !!(await Property.findById(arg));
       }
-    }, "Invalid agent id."),
+    }, "Invalid property id.")
+    .optional(),
 });
 
 export type AgencySchemaType = z.infer<typeof agencySchema>;
