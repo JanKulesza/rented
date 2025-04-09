@@ -7,6 +7,7 @@ import {
 } from "../utils/schemas/property.ts";
 import Agency from "../models/agency.ts";
 import User from "../models/user.ts";
+import { deleteImage, uploadImage } from "../utils/cloudinary.ts";
 
 export const getProperties = async (req: Request, res: Response) => {
   const properties = await Property.find();
@@ -35,7 +36,12 @@ export const createProperty = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { success, error } = await propertySchema.safeParseAsync(req.body);
+  const { success, error } = await propertySchema.safeParseAsync({
+    ...req.body,
+    price: 10,
+    rating: 10,
+    image: req.file,
+  });
 
   if (!success) {
     res.status(400).json(error.formErrors);
@@ -59,6 +65,8 @@ export const createProperty = async (
     return;
   }
 
+  const { id, url } = await uploadImage(req.file!.path);
+
   const property = new Property({
     agency,
     description,
@@ -68,6 +76,7 @@ export const createProperty = async (
     price,
     propertyType,
     rating,
+    image: { id, url },
   });
 
   const session = await mongoose.startSession();
@@ -89,9 +98,10 @@ export const createProperty = async (
     res.status(201).json(savedProperty);
   } catch (error) {
     await session.abortTransaction();
+    await deleteImage(id);
     next(error);
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };
 
@@ -124,7 +134,7 @@ export const updateProperty = async (
         return false;
       }
     })
-    .safeParseAsync(req.body);
+    .safeParseAsync({ ...req.body, image: req.file });
 
   if (!success) {
     res.status(400).json(error.formErrors);
@@ -170,6 +180,11 @@ export const updateProperty = async (
       updateData.agent = agent;
     }
 
+    if (req.file) {
+      const imageData = await uploadImage(req.file.path);
+      updateData.image = imageData;
+    }
+
     const updatedProperty = await Property.findByIdAndUpdate(id, updateData, {
       new: true,
       session,
@@ -178,10 +193,11 @@ export const updateProperty = async (
     await session.commitTransaction();
     res.json(updatedProperty);
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
+    if (updateData.image) await deleteImage(updateData.image.id);
     next(error);
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };
 
@@ -220,11 +236,12 @@ export const deleteProperty = async (
     );
 
     await session.commitTransaction();
+    await deleteImage(property.image.id);
     res.json({});
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
     next(error);
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };

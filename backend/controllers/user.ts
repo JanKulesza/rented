@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { userSchema, type UserSchemaType } from "../utils/schemas/user.ts";
 import Property from "../models/property.ts";
 import Agency from "../models/agency.ts";
+import { deleteImage, uploadImage } from "../utils/cloudinary.ts";
 
 export const getUsers = async (req: Request, res: Response) => {
   const users = await User.find();
@@ -67,7 +68,7 @@ export const updateUser = async (
 
   const { success, error } = await userSchema
     .partial()
-    .safeParseAsync(req.body);
+    .safeParseAsync({ ...req.body, image: req.file });
 
   if (!success) {
     res.status(400).json(error.formErrors);
@@ -105,14 +106,21 @@ export const updateUser = async (
       }
     }
 
-    if (agency) {
+    if (agency || agency === null) {
       updateData.agency = agency;
 
       await Agency.findByIdAndUpdate(
         agency,
-        { $push: { agents: user._id } },
+        agency
+          ? { $push: { agents: user._id } }
+          : { $pull: { agents: user._id } },
         { session }
       );
+    }
+
+    if (req.file) {
+      const imageData = await uploadImage(req.file.path);
+      updateData.image = imageData;
     }
 
     const updatedUser = await User.findByIdAndUpdate(id, updateData, {
@@ -123,10 +131,11 @@ export const updateUser = async (
     await session.commitTransaction();
     res.json(updatedUser);
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
+    if (updateData.image) await deleteImage(updateData.image.id);
     next(error);
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };
 
@@ -174,9 +183,9 @@ export const deleteUser = async (
     await session.commitTransaction();
     res.json({});
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
     next(error);
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };

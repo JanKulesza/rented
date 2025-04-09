@@ -2,6 +2,7 @@ import { z } from "zod";
 import mongoose from "mongoose";
 import Agency from "../../models/agency.ts";
 import Property from "../../models/property.ts";
+import { ACCEPTED_IMAGE_TYPES } from "./property.ts";
 
 export const userSchema = z.object({
   firstName: z
@@ -16,6 +17,12 @@ export const userSchema = z.object({
   password: z
     .string({ required_error: "Password is required." })
     .min(6, "Password must be at least 8 characters long."),
+  image: z
+    .any({ required_error: "File is required." })
+    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.mimetype), {
+      message: "Invalid image file type",
+    })
+    .optional(),
   sold: z.number().min(0, "Invalid number,").optional(),
   agency: z
     .string({ required_error: "Agency is required." })

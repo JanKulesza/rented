@@ -14,10 +14,23 @@ export enum PropertyTypes {
   INDUSTRIAL = "Industrial",
 }
 
+export const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "image/svg+xml",
+];
+
 export const propertySchema = z.object({
   name: z
     .string({ required_error: "Name is required." })
     .min(5, "Provide correct name."),
+  image: z
+    .any({ required_error: "File is required." })
+    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.mimetype), {
+      message: "Invalid image file type",
+    }),
   description: z
     .string({ required_error: "Description is required." })
     .min(5, "Provide correct description."),

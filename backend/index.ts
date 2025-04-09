@@ -3,11 +3,13 @@ import express from "express";
 import { handleError } from "./middlewares/error.ts";
 import connectDB from "./utils/db.ts";
 import setupRoutes from "./routes/index.ts";
+import upload from "./utils/multer.ts";
 
 export const app = express();
 
 // Middlewares
 app.use(express.json());
+app.use(upload.single("image"));
 
 setupRoutes(app);
 
