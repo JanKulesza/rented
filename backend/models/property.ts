@@ -26,7 +26,6 @@ const propertySchema = new mongoose.Schema({
   propertyType: {
     type: String,
     enum: PropertyTypes,
-    ref: "Property Type",
     required: true,
   },
 });

@@ -54,7 +54,13 @@ export const createAgency = async (
     return;
   }
 
-  const owner = new User({ firstName, lastName, email, password });
+  const owner = new User({
+    firstName,
+    lastName,
+    email,
+    password,
+    role: "owner",
+  });
 
   const { name, location } = req.body as AgencySchemaType;
 
@@ -114,20 +120,13 @@ export const updateAgency = async (req: Request, res: Response) => {
     return;
   }
 
-  const { name, location, owner } = req.body as AgencySchemaType;
-
-  const newOwner = await User.findById(owner);
-  if (!newOwner) {
-    res.status(404).json({ error: "User not found." });
-    return;
-  }
+  const { name, location } = req.body as AgencySchemaType;
 
   const updatedAgency = await Agency.findByIdAndUpdate(
     id,
     {
       name,
       location,
-      owner,
     },
     { new: true }
   ).populate("owner");

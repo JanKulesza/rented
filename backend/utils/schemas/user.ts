@@ -4,6 +4,12 @@ import Agency from "../../models/agency.ts";
 import Property from "../../models/property.ts";
 import { ACCEPTED_IMAGE_TYPES } from "./property.ts";
 
+export enum UserRoles {
+  OWNER = "owner",
+  AGENT = "agent",
+  USER = "user",
+}
+
 export const userSchema = z.object({
   firstName: z
     .string({ required_error: "First name is required." })
@@ -16,7 +22,9 @@ export const userSchema = z.object({
     .email("Invalid email."),
   password: z
     .string({ required_error: "Password is required." })
-    .min(6, "Password must be at least 8 characters long."),
+    .min(6, "Password must be at least 8 characters long.")
+    .max(32, "Password must be less than 32 characters"),
+  role: z.nativeEnum(UserRoles, { required_error: "role is required" }),
   image: z
     .any({ required_error: "File is required." })
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.mimetype), {

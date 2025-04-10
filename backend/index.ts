@@ -9,6 +9,7 @@ export const app = express();
 
 // Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(upload.single("image"));
 
 setupRoutes(app);

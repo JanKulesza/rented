@@ -36,14 +36,15 @@ export const createUser = async (req: Request, res: Response) => {
     return;
   }
 
-  const { firstName, lastName, email, password } = req.body as UserSchemaType;
+  const { firstName, lastName, email, password, role } =
+    req.body as UserSchemaType;
 
   if (await User.findOne({ email })) {
     res.status(400).json({ error: "User already exists." });
     return;
   }
 
-  const user = new User({ firstName, lastName, email, password });
+  const user = new User({ firstName, lastName, email, password, role });
   const savedUser = await user.save();
 
   res.status(201).json(savedUser);
@@ -75,8 +76,16 @@ export const updateUser = async (
     return;
   }
 
-  const { email, firstName, lastName, password, sold, agency, properties } =
-    req.body as Partial<UserSchemaType>;
+  const {
+    email,
+    firstName,
+    lastName,
+    password,
+    sold,
+    role,
+    agency,
+    properties,
+  } = req.body as Partial<UserSchemaType>;
 
   if (email && (await User.findOne({ email }))) {
     res.status(400).json({ error: "User already exists." });
@@ -89,6 +98,7 @@ export const updateUser = async (
     lastName,
     password,
     sold,
+    role,
   };
 
   const session = await mongoose.startSession();

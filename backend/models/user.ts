@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { deleteImage } from "../utils/cloudinary.ts";
+import { UserRoles } from "../utils/schemas/user.ts";
 
 const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
@@ -14,7 +15,7 @@ const userSchema = new mongoose.Schema({
     _id: false,
   },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, required: true, min: 6, max: 32 },
   agency: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Agency",
@@ -26,12 +27,19 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   sold: { type: Number, min: 0, default: 0 },
+  role: { type: String, enum: UserRoles, default: "user" },
 });
 
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
   return user;
+};
+
+userSchema.methods.comparePasswords = async function (password: string) {
+  const user = this.toObject();
+
+  return await bcrypt.compare(password, user.password);
 };
 
 userSchema.pre("save", async function (next) {
@@ -62,6 +70,10 @@ userSchema.pre(["findOneAndDelete", "findOneAndUpdate"], async function (next) {
   next();
 });
 
-const User = mongoose.model("User", userSchema);
+export interface UserDoc extends mongoose.InferSchemaType<typeof userSchema> {
+  comparePasswords: (password: string) => boolean;
+}
+
+const User = mongoose.model<UserDoc>("User", userSchema);
 
 export default User;
