@@ -1,4 +1,4 @@
-# Rentify – Long-Term Rental Platform with CMS - in development
+# Rentify – Rental Platform with CMS - in development
 Rentify is a modern web application inspired by Airbnb, built specifically for long-term house rentals. It offers an intuitive platform for users seeking extended stays and features a powerful CMS tailored for real estate agencies to manage listings, bookings, and client interactions efficiently.
 
 ## Tech Stack
@@ -29,14 +29,12 @@ Rentify is a modern web application inspired by Airbnb, built specifically for l
 
 ### File Handling
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
-![Multer](https://img.shields.io/badge/Multer-000000?style=for-the-badge&logo=multer&logoColor=white)
 
 ### Monitoring
 ![Sentry](https://img.shields.io/badge/Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white)
 
 ### Development Tools
 ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
-[![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=fff)](#)
 [![Yarn](https://img.shields.io/badge/Yarn-2C8EBB?style=for-the-badge&logo=yarn&logoColor=fff)](#)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
