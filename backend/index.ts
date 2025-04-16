@@ -4,6 +4,7 @@ import { handleError } from "./middlewares/error.ts";
 import connectDB from "./utils/db.ts";
 import setupRoutes from "./routes/index.ts";
 import upload from "./utils/multer.ts";
+import * as Sentry from "@sentry/node";
 import cors from "cors";
 
 export const app = express();
@@ -19,6 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(upload.single("image"));
 
 setupRoutes(app);
+
+// Sentry
+Sentry.setupExpressErrorHandler(app);
 
 // Error handler
 app.use(handleError);

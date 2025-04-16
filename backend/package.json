@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "node --experimental-transform-types --watch index.ts",
-    "lint": "npx eslint"
+    "lint": "npx eslint",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org jan-kulesza --project rentify ./ && sentry-cli sourcemaps upload --org jan-kulesza --project rentify ./"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -20,6 +21,8 @@
     "typescript-eslint": "^8.29.0"
   },
   "dependencies": {
+    "@sentry/cli": "^2.43.0",
+    "@sentry/node": "^9.13.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.6.0",
     "cors": "^2.8.5",
