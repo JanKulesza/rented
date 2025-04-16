@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const NavBar = () => {
   return (
-    <div className="bg-main h-4/5 flex justify-between px-[3vw] lg:px-[20vw] py-6 items-center shadow">
+    <div className="bg-main h-[10vh] flex justify-between px-[3vw] lg:px-[5vw] py-6 items-center shadow">
       <div className="flex items-center gap-2">
         <Image src={logo} width={45} height={45} alt="logo" />
         <h1 className="font-bold text-3xl  text-theme">rented</h1>
@@ -18,7 +18,7 @@ const NavBar = () => {
             Start renting
           </Button>
         </Link>
-        <Link href="/">
+        <Link href="/signin">
           <Button variant="default" className="cursor-pointer" size="lg">
             Sign In
           </Button>

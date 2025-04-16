@@ -4,11 +4,17 @@ import { handleError } from "./middlewares/error.ts";
 import connectDB from "./utils/db.ts";
 import setupRoutes from "./routes/index.ts";
 import upload from "./utils/multer.ts";
+import cors from "cors";
 
 export const app = express();
 
 // Middlewares
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(upload.single("image"));
 

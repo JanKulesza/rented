@@ -18,7 +18,7 @@ export const signin = async (req: Request, res: Response) => {
     return;
   }
 
-  const isAuthorized = user.comparePasswords(password);
+  const isAuthorized = await user.comparePasswords(password);
 
   if (!isAuthorized) {
     res.status(401).json({ error: "Invalid credentials." });

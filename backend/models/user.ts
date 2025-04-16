@@ -39,7 +39,7 @@ userSchema.methods.toJSON = function () {
 userSchema.methods.comparePasswords = async function (password: string) {
   const user = this.toObject();
 
-  return await bcrypt.compare(password, user.password);
+  return bcrypt.compare(password, user.password);
 };
 
 userSchema.pre("save", async function (next) {
@@ -71,7 +71,7 @@ userSchema.pre(["findOneAndDelete", "findOneAndUpdate"], async function (next) {
 });
 
 export interface UserDoc extends mongoose.InferSchemaType<typeof userSchema> {
-  comparePasswords: (password: string) => boolean;
+  comparePasswords: (password: string) => Promise<boolean>;
 }
 
 const User = mongoose.model<UserDoc>("User", userSchema);
