@@ -1,12 +1,21 @@
 import { v2 as cloudinary } from "cloudinary";
 
-export const configCloudinary = () =>
+export const configCloudinary = () => {
+  const { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } =
+    process.env;
+
+  if (!CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET || !CLOUDINARY_CLOUD_NAME)
+    throw new Error(
+      "FATAL ERROR: cloudinary environmental variables are not defined."
+    );
+
   cloudinary.config({
     secure: true,
-    api_key: "682548542715548",
-    api_secret: "ooY52lYy-mQJlcUIwymyK-Kh9Rg",
-    cloud_name: "duydunnlr",
+    api_key: CLOUDINARY_API_KEY,
+    api_secret: CLOUDINARY_API_SECRET,
+    cloud_name: CLOUDINARY_CLOUD_NAME,
   });
+};
 
 export const uploadImage = async (imagePath: string) => {
   // Use the uploaded file's name as the asset's public ID and
