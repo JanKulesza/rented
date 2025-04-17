@@ -9,24 +9,26 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import skyscraper from "@/public/skyscraper.jpeg";
-import SignInForm from "@/components/forms/signin";
+import SignUpForm from "@/components/forms/signup";
 
 const Signin = () => {
   return (
     <div className="flex h-[90vh]">
       <Card className="h-full w-full lg:w-2/5 gap-6 rounded-none flex flex-col justify-center items-center">
         <CardHeader className="text-center w-full">
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Please enter your details.</CardDescription>
+          <CardTitle className="text-2xl">Sign Up</CardTitle>
+          <CardDescription>
+            Please enter your details in order to sign up.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <SignInForm />
+          <SignUpForm />
         </CardContent>
         <CardFooter className="justify-center">
           <p>
-            Don&apos;t have an account?{" "}
-            <Link className="text-theme" href="/signup">
-              Sign up
+            Already have an account?{" "}
+            <Link className="text-theme" href="/signin">
+              Sign in
             </Link>
           </p>
         </CardFooter>

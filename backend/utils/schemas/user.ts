@@ -22,7 +22,7 @@ export const userSchema = z.object({
     .email("Invalid email."),
   password: z
     .string({ required_error: "Password is required." })
-    .min(6, "Password must be at least 8 characters long.")
+    .min(6, "Password must be at least 6 characters long.")
     .max(32, "Password must be less than 32 characters"),
   role: z.nativeEnum(UserRoles, { required_error: "role is required" }),
   image: z
