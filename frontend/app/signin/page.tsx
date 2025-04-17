@@ -25,7 +25,7 @@ const Signin = () => {
         <CardFooter className="justify-center">
           <p>
             Don&apos;t have an account?{" "}
-            <Link className="text-theme" href="/signup">
+            <Link className="text-primary" href="/signup">
               Sign up
             </Link>
           </p>
