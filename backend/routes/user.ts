@@ -10,7 +10,7 @@ import { auth } from "../middlewares/auth.ts";
 
 const router = Router();
 
-router.get("/", getUsers);
+router.get("/", auth, getUsers);
 router.post("/", createUser);
 
 router.get("/:id", getUser);

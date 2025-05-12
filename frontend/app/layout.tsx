@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import NavBar from "@/components/navbar";
+import NavBar from "@/components/elements/navbar";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import AuthProvider from "@/components/providers/auth-provider";
 
 const roboto = Roboto({
   variable: "--font-geist-sans",
@@ -26,15 +27,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${roboto.variable} ${robotoMono.variable} antialiased`}>
+      <body
+        className={`${roboto.variable} ${robotoMono.variable} antialiased bg-card relative`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <NavBar />
-          {children}
+          <AuthProvider>
+            <NavBar />
+            <div className="mt-[10vh]">{children}</div>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import google from "@/public/google.svg";
 import { Button } from "../ui/button";
 import FormInput from "../inputs/form-input";
@@ -11,10 +11,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema, SignupSchemaType } from "./signup-schema";
 import Spinner from "../ui/spinner";
+import { authContext } from "../providers/auth-provider";
 
 const SignUpForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { signin } = useContext(authContext);
 
   const form = useForm<SignupSchemaType>({
     resolver: zodResolver(signupSchema),
@@ -44,23 +46,14 @@ const SignUpForm = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (res.ok) {
-        const res = await fetch("http://localhost:8080/api/auth/signin", {
-          method: "POST",
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-          headers: { "Content-Type": "application/json" },
-        });
-        const { token } = await res.json();
+      if (res.status === 201) {
+        const res = await signin({ email, password });
 
-        if (!token || !res.ok) {
+        if (res.status !== 200) {
           router.push("/signin");
           return;
         }
 
-        localStorage.setItem("token", token);
         router.push("/");
       }
       const data = await res.json();

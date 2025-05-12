@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "../ui/button";
 import FormInput from "../inputs/form-input";
@@ -11,10 +11,12 @@ import { signinSchema, SigninSchemaType } from "./signin-schema";
 import { Form } from "../ui/form";
 import Image from "next/image";
 import Spinner from "../ui/spinner";
+import { authContext } from "../providers/auth-provider";
 
 const SignInForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { signin } = useContext(authContext);
   const form = useForm<SigninSchemaType>({
     resolver: zodResolver(signinSchema),
     defaultValues: {
@@ -26,19 +28,9 @@ const SignInForm = () => {
   const onSubmit = async (values: SigninSchemaType) => {
     try {
       setIsLoading(true);
-      const res = await fetch("http://localhost:8080/api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-      console.log(res);
+      const res = await signin(values);
 
-      if (res.ok) {
-        const { token } = await res.json();
-
-        localStorage.setItem("token", token);
+      if (res.status === 200) {
         router.push("/");
       }
       if (res.status === 401) {

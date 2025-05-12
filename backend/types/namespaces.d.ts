@@ -16,3 +16,9 @@ declare module "jsonwebtoken" {
     role: UserRoles;
   }
 }
+
+declare module "cookie" {
+  export interface SerializeOptions {
+    origin?: string;
+  }
+}

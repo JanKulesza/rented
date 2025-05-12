@@ -6,14 +6,18 @@ import setupRoutes from "./routes/index.ts";
 import upload from "./utils/multer.ts";
 import * as Sentry from "@sentry/node";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 
 // Middlewares
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:3000",
+    credentials: true,
+    exposedHeaders: ["Authorization"],
   })
 );
 app.use(express.urlencoded({ extended: true }));
