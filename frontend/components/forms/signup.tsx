@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import google from "@/public/google.svg";
 import { Button } from "../ui/button";
 import FormInput from "../inputs/form-input";
@@ -16,6 +16,7 @@ import { authContext } from "../providers/auth-provider";
 const SignUpForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [googleCallback, setGoogleCallback] = useState<string | null>(null);
   const { signin } = useContext(authContext);
 
   const form = useForm<SignupSchemaType>({
@@ -75,6 +76,18 @@ const SignUpForm = () => {
     }
   };
 
+  useEffect(() => {
+    (async () => {
+      const res = await fetch(
+        "http://localhost:8080/api/auth/google/callback",
+        {
+          credentials: "include",
+        }
+      );
+      if (res.status === 200) setGoogleCallback((await res.json()).url);
+    })();
+  }, []);
+
   return (
     <Form {...form}>
       <form
@@ -116,16 +129,18 @@ const SignUpForm = () => {
         <Button variant="default" type="submit" className="mt-4 cursor-pointer">
           {isLoading ? <Spinner /> : "Sign Up"}
         </Button>
-        <Button
-          variant="ghost"
-          className="border-thin border border-zinc-300"
-          asChild
-        >
-          <Link href="/">
-            <Image src={google} alt="" className="w-8 h-8" />
-            Sign Up with Google
-          </Link>
-        </Button>
+        {googleCallback && (
+          <Button
+            variant="ghost"
+            className="border-thin border border-zinc-300"
+            asChild
+          >
+            <Link href={googleCallback}>
+              <Image src={google} alt="" className="w-8 h-8" />
+              Sign Up with Google
+            </Link>
+          </Button>
+        )}
       </form>
     </Form>
   );

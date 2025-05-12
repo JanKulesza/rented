@@ -3,32 +3,41 @@ import bcrypt from "bcrypt";
 import { deleteImage } from "../utils/cloudinary.ts";
 import { UserRoles } from "../utils/schemas/user.ts";
 
-const userSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  image: {
-    type: {
-      id: { type: String, required: true },
-      url: { type: String, required: true },
+export enum OAuthProviders {
+  GOOGLE = "google",
+}
+
+const userSchema = new mongoose.Schema(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    image: {
+      type: {
+        id: { type: String, required: true },
+        url: { type: String, required: true },
+      },
+      default: null,
+      _id: false,
     },
-    default: null,
-    _id: false,
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: false, min: 6, max: 32 },
+    oauthProvider: { type: String, enum: OAuthProviders },
+    oauthId: { type: String, index: true },
+    agency: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Agency",
+      default: null,
+    },
+    properties: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Property",
+      default: [],
+    },
+    sold: { type: Number, min: 0, default: 0 },
+    role: { type: String, enum: UserRoles, default: "user" },
   },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true, min: 6, max: 32 },
-  agency: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Agency",
-    default: null,
-  },
-  properties: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "Property",
-    default: [],
-  },
-  sold: { type: Number, min: 0, default: 0 },
-  role: { type: String, enum: UserRoles, default: "user" },
-});
+  { timestamps: true }
+);
 
 userSchema.methods.toJSON = function () {
   const user = this.toObject();

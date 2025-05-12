@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "../ui/button";
 import FormInput from "../inputs/form-input";
@@ -16,6 +16,7 @@ import { authContext } from "../providers/auth-provider";
 const SignInForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [googleCallback, setGoogleCallback] = useState<string | null>(null);
   const { signin } = useContext(authContext);
   const form = useForm<SigninSchemaType>({
     resolver: zodResolver(signinSchema),
@@ -43,6 +44,19 @@ const SignInForm = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch(
+        "http://localhost:8080/api/auth/google/callback",
+        {
+          credentials: "include",
+        }
+      );
+      if (res.status === 200) setGoogleCallback((await res.json()).url);
+    })();
+  }, []);
+
   return (
     <Form {...form}>
       <form
@@ -67,16 +81,18 @@ const SignInForm = () => {
         <Button variant="default" type="submit" className="mt-4 cursor-pointer">
           {isLoading ? <Spinner /> : "Log in"}
         </Button>
-        <Button
-          variant="ghost"
-          className="border-thin border border-zinc-300 cursor-pointer"
-          asChild
-        >
-          <Link href="/google">
-            <Image src={google} alt="" className="w-8 h-8" />
-            Sign In with Google
-          </Link>
-        </Button>
+        {googleCallback && (
+          <Button
+            variant="ghost"
+            className="border-thin border border-zinc-300 cursor-pointer"
+            asChild
+          >
+            <Link href={googleCallback}>
+              <Image src={google} alt="" className="w-8 h-8" />
+              Sign In with Google
+            </Link>
+          </Button>
+        )}
       </form>
     </Form>
   );
