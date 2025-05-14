@@ -6,15 +6,21 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { authContext } from "../providers/auth-provider";
+import { usePathname } from "next/navigation";
 
 const NavBar = () => {
   const { user, signout } = useContext(authContext);
+  const path = usePathname();
 
   return (
-    <div className="h-[10vh] bg-card/95 flex justify-between px-[3vw] lg:px-[5vw] py-6 top-0 items-center fixed opacity-90 w-full">
+    <div
+      className={`h-[10vh] bg-sidebar border-sidebar-border border-b flex justify-between px-3 ${
+        !path.startsWith("/app") && "lg:px-10"
+      } py-6 top-0 items-center fixed w-full`}
+    >
       <Link href="/" className="flex items-center gap-2">
         <Image src={logo} width={45} height={45} alt="logo" />
-        <h1 className="font-bold text-3xl text-primary">Rentify</h1>
+        <h1 className="font-bold text-3xl text-primary">Rented</h1>
       </Link>
 
       <div className="flex gap-4 items-center">

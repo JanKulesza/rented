@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
   return (
     <div>
-      <div className="bg-[url(../public/framer.jpg)] bg-cover bg-center bg-fixed h-[90vh] mx-auto mb-30 overflow-hidden">
+      <div className="bg-[url(../public/skyscraper.jpeg)] bg-cover bg-center bg-fixed h-[90vh] mx-auto mb-30 overflow-hidden">
         <div className="flex flex-col justify-center gap-8 from-zinc-900/20 to-zinc-900/70 bg-gradient-to-b  w-full h-full p-6 md:p-20">
           <h2 className="text-white text-2xl lg:text-5xl xl:text-7xl font-bold uppercase xl:w-1/2">
             Find your perfect home today

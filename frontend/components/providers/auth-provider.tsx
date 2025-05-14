@@ -99,7 +99,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (!accessToken) await getNewToken();
 
-        if (res?.status === 200) {
+        if (res?.ok) {
           const user = await res.json();
           setUser(user);
         }
