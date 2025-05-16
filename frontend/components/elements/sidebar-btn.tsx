@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import { ReactNode } from "react";
+import Link from "next/link";
 
 interface Props {
   item: {
@@ -22,10 +23,10 @@ const SidebarButton = ({ item }: Props) => {
         }`}
         asChild
       >
-        <a href={item.url}>
+        <Link href={item.url}>
           {item.icon}
           <span>{item.title}</span>
-        </a>
+        </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );

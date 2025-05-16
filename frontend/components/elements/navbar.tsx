@@ -7,9 +7,10 @@ import Link from "next/link";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { authContext } from "../providers/auth-provider";
 import { usePathname } from "next/navigation";
+import ProfileDropdown from "./profile-dropdown";
 
 const NavBar = () => {
-  const { user, signout } = useContext(authContext);
+  const { user } = useContext(authContext);
   const path = usePathname();
 
   return (
@@ -37,17 +38,7 @@ const NavBar = () => {
             </Button>
           </Link>
         ) : (
-          <div className="flex gap-2 items-center">
-            <p>Hello {user.firstName + " " + user.lastName}!</p>
-            <Button
-              variant="destructive"
-              className="cursor-pointer"
-              onClick={signout}
-              size="lg"
-            >
-              Sign Out
-            </Button>
-          </div>
+          <ProfileDropdown user={user} />
         )}
 
         <ModeToggle />

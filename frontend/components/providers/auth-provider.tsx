@@ -3,11 +3,11 @@ import React from "react";
 import { UserRoles } from "../forms/signup-schema";
 import { SigninSchemaType } from "../forms/signin-schema";
 
-interface User {
+export interface User {
   _id: string;
   firstName: string;
   lastName: string;
-  image: string | null;
+  image: { id: string; url: string } | null;
   email: string;
   agency: string | null;
   properties: string[];
