@@ -56,11 +56,15 @@ export const createProperty = async (
     price,
     propertyType,
     rating,
+    listing,
   } = req.body as PropertySchemaType;
 
   const assignedAgency = await Agency.findById(agency);
   const assignedAgent = await User.findById(agent);
-  if (!assignedAgency!.agents.includes(new mongoose.Types.ObjectId(agent))) {
+  if (
+    !assignedAgency!.agents.includes(new mongoose.Types.ObjectId(agent)) &&
+    assignedAgency?.owner !== new mongoose.Types.ObjectId(agent)
+  ) {
     res.status(400).json({ error: "Agent does not belong to this agency." });
     return;
   }
@@ -77,6 +81,7 @@ export const createProperty = async (
     propertyType,
     rating,
     image: { id, url },
+    listing,
   });
 
   const session = await mongoose.startSession();
@@ -150,6 +155,7 @@ export const updateProperty = async (
     price,
     propertyType,
     rating,
+    listing,
   } = req.body as Partial<PropertySchemaType>;
 
   const updateData: Partial<PropertySchemaType> = {
@@ -159,6 +165,7 @@ export const updateProperty = async (
     price,
     propertyType,
     rating,
+    listing,
   };
 
   const session = await mongoose.startSession();

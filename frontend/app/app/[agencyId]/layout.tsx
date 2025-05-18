@@ -13,7 +13,7 @@ export default async function Layout({
   const { agencyId } = await params;
 
   const res = await fetch(`http://localhost:8080/api/agencies/${agencyId}`, {
-    cache: "no-store",
+    cache: "default",
   });
 
   if (!res.ok) return notFound();
@@ -24,15 +24,13 @@ export default async function Layout({
 
   return (
     <AgencyProvider agency={agency}>
-      <div>
-        <SidebarProvider>
-          <AppSidebar agencyId={agencyId} />
-          <main>
-            <SidebarTrigger />
-            {children}
-          </main>
-        </SidebarProvider>
-      </div>
+      <SidebarProvider>
+        <AppSidebar agencyId={agencyId} />
+        <div className="w-full">
+          <SidebarTrigger className="fixed bottom-2 w-10 h-10" />
+          <main className=" p-6 space-y-6">{children}</main>
+        </div>
+      </SidebarProvider>
     </AgencyProvider>
   );
 }

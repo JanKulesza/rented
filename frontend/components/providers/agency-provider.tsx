@@ -1,13 +1,51 @@
 "use client";
 import { createContext } from "react";
+import { User } from "./auth-provider";
+
+export enum PropertyTypes {
+  APARTAMENT = "Apartment",
+  STUDIO = "Studio",
+  HOUSE = "House",
+  VILLA = "Villa",
+  CONDO = "Condo",
+  TOWNHOUSE = "Townhouse",
+  COMMERCIAL = "Commercial",
+  INDUSTRIAL = "Industrial",
+}
+
+export enum ListingTypes {
+  SALE = "sale",
+  RENT = "rent",
+}
+
+export interface Property {
+  _id: string;
+  image: {
+    id: string;
+    url: string;
+  };
+  description: string;
+  price: number;
+  listing: {
+    listingType: ListingTypes;
+    isSold: boolean;
+  };
+  rating: number;
+  location: string;
+  Agency: string | Agency;
+  agent: string | User;
+  propertyType: PropertyTypes;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface Agency {
   _id: string;
   name: string;
   location: string;
   owner: string;
-  agents: string[];
-  properties: string[];
+  agents: string[] | User[];
+  properties: string[] | Property[];
 }
 
 interface AgencyContext {

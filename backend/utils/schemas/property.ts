@@ -22,15 +22,24 @@ export const ACCEPTED_IMAGE_TYPES = [
   "image/svg+xml",
 ];
 
+export enum ListingTypes {
+  SALE = "sale",
+  RENT = "rent",
+}
+
 export const propertySchema = z.object({
   name: z
     .string({ required_error: "Name is required." })
     .min(5, "Provide correct name."),
   image: z
     .any({ required_error: "File is required." })
-    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.mimetype), {
-      message: "Invalid image file type",
-    }),
+    .optional()
+    .refine(
+      (file) => (file ? ACCEPTED_IMAGE_TYPES.includes(file.mimetype) : true),
+      {
+        message: "Invalid image file type",
+      }
+    ),
   description: z
     .string({ required_error: "Description is required." })
     .min(5, "Provide correct description."),
@@ -41,7 +50,12 @@ export const propertySchema = z.object({
     .number({ required_error: "Rating is required." })
     .min(0, "Provide correct rating.")
     .max(100, "Provide correct rating."),
-  isRented: z.boolean().optional(),
+  listing: z.object({
+    listingType: z.nativeEnum(ListingTypes, {
+      required_error: "Listing type is required.",
+    }),
+    isSold: z.boolean().optional().default(false),
+  }),
   location: z
     .string({ required_error: "Location is required." })
     .min(3, "Provide correct location."),
@@ -53,7 +67,9 @@ export const propertySchema = z.object({
     }, "Invalid agency id."),
   agent: z
     .string({ required_error: "Agent is required." })
+    .optional()
     .refine(async (arg) => {
+      if (!arg) return true;
       if (!mongoose.isValidObjectId(arg)) return false;
       return !!(await User.findById(arg));
     }, "Invalid agent id."),

@@ -10,7 +10,30 @@ import User from "../models/user.ts";
 import Property from "../models/property.ts";
 
 export const getAgencies = async (req: Request, res: Response) => {
-  const agencies = await Agency.find();
+  const { populate } = req.query;
+  enum PopulateEnum {
+    "owner",
+    "agents",
+    "properties",
+  }
+
+  if (!populate) {
+    const agencies = await Agency.find();
+    res.json(agencies);
+    return;
+  }
+
+  if (!Array.isArray(populate)) {
+    res.status(400).json({ error: "Invalid populate query type." });
+    return;
+  }
+  let isValid = true;
+  for (const val of populate)
+    if (!Object.values(PopulateEnum).includes(val.toString())) isValid = false;
+
+  const agencies = await Agency.find().populate(
+    isValid && populate ? populate.map((p) => p.toString()) : []
+  );
 
   res.json(agencies);
 };
