@@ -112,7 +112,7 @@ const DataPieCharts = () => {
       {propertiesData.map((data) => (
         <div
           key={data.title}
-          className="flex h-32 lg:h-40 items-center border border-sidebar-border rounded-xl px-8 p-4"
+          className="flex h-36 items-center border border-sidebar-border rounded-xl px-8 p-4"
         >
           <div className="space-y-1 w-1/2">
             <p className="lg:text-lg">{data.title}</p>

@@ -17,7 +17,7 @@ const NavBar = () => {
     <div
       className={`h-[10vh] bg-sidebar border-sidebar-border border-b flex justify-between px-3 ${
         !path.startsWith("/app") && "lg:px-10"
-      } py-6 top-0 items-center fixed w-full`}
+      } py-6 top-0 items-center fixed w-full z-50`}
     >
       <Link href="/" className="flex items-center gap-2">
         <Image src={logo} width={45} height={45} alt="logo" />
