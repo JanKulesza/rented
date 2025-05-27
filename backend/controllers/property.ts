@@ -36,10 +36,9 @@ export const createProperty = async (
   res: Response,
   next: NextFunction
 ) => {
+  req.body.price = parseInt(req.body.price);
   const { success, error } = await propertySchema.safeParseAsync({
     ...req.body,
-    price: 10,
-    rating: 10,
     image: req.file,
   });
 
@@ -56,7 +55,7 @@ export const createProperty = async (
     price,
     propertyType,
     rating,
-    listing,
+    listingType,
   } = req.body as PropertySchemaType;
 
   const assignedAgency = await Agency.findById(agency);
@@ -81,7 +80,7 @@ export const createProperty = async (
     propertyType,
     rating,
     image: { id, url },
-    listing,
+    listingType,
   });
 
   const session = await mongoose.startSession();

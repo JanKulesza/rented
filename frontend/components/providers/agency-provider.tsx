@@ -14,25 +14,25 @@ export enum PropertyTypes {
 }
 
 export enum ListingTypes {
-  SALE = "sale",
-  RENT = "rent",
+  SALE = "Sale",
+  RENT = "Rent",
+  PENDING = "Pending",
 }
 
 export interface Property {
   _id: string;
+  name: string;
   image: {
     id: string;
     url: string;
   };
   description: string;
   price: number;
-  listing: {
-    listingType: ListingTypes;
-    isSold: boolean;
-  };
+  listingType: ListingTypes;
+  isSold: boolean;
   rating: number;
   location: string;
-  Agency: string | Agency;
+  agency: string | Agency;
   agent: string | User;
   propertyType: PropertyTypes;
   createdAt: Date;

@@ -23,8 +23,9 @@ export const ACCEPTED_IMAGE_TYPES = [
 ];
 
 export enum ListingTypes {
-  SALE = "sale",
-  RENT = "rent",
+  SALE = "Sale",
+  RENT = "Rent",
+  PENDING = "Pending",
 }
 
 export const propertySchema = z.object({
@@ -49,13 +50,12 @@ export const propertySchema = z.object({
   rating: z
     .number({ required_error: "Rating is required." })
     .min(0, "Provide correct rating.")
-    .max(100, "Provide correct rating."),
-  listing: z.object({
-    listingType: z.nativeEnum(ListingTypes, {
-      required_error: "Listing type is required.",
-    }),
-    isSold: z.boolean().optional().default(false),
+    .max(100, "Provide correct rating.")
+    .optional(),
+  listingType: z.nativeEnum(ListingTypes, {
+    required_error: "Listing type is required.",
   }),
+  isSold: z.boolean().optional().default(false),
   location: z
     .string({ required_error: "Location is required." })
     .min(3, "Provide correct location."),

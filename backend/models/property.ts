@@ -15,15 +15,9 @@ const propertySchema = new mongoose.Schema(
     },
     description: { type: String, required: true },
     price: { type: Number, required: true },
-    listing: {
-      type: {
-        listingType: { type: String, enum: ListingTypes, required: true },
-        isSold: { type: Boolean, default: false },
-      },
-      required: true,
-      _id: false,
-    },
-    rating: { type: Number, required: true, min: 0, max: 100 },
+    listingType: { type: String, enum: ListingTypes, required: true },
+    isSold: { type: Boolean, default: false },
+    rating: { type: Number, default: 0, min: 0, max: 100 },
     location: { type: String, required: true },
     agency: {
       type: mongoose.Schema.Types.ObjectId,

@@ -1,3 +1,4 @@
+"use client";
 import {
   agencyContext,
   ListingTypes,
@@ -10,10 +11,10 @@ const DataPieCharts = () => {
   const { agency } = useContext(agencyContext);
 
   const propertiesForSale = agency.properties.filter(
-    (p) => (p as Property).listing.listingType === ListingTypes.SALE
+    (p) => (p as Property).listingType === ListingTypes.SALE
   ).length;
   const propertiesForRent = agency.properties.filter(
-    (p) => (p as Property).listing.listingType === ListingTypes.RENT
+    (p) => (p as Property).listingType === ListingTypes.RENT
   ).length;
   const pendingProperties = agency.properties.filter(
     (p) => !(p as Property).agent
@@ -38,7 +39,7 @@ const DataPieCharts = () => {
         agency.properties.length === 0 && {
           name: "No properties",
           value: 1,
-          fill: "#e5e5e5",
+          fill: "var(--accent)",
         },
       ],
     },
@@ -55,12 +56,12 @@ const DataPieCharts = () => {
           ? {
               name: "Rest",
               value: agency.properties.length - propertiesForRent || 1,
-              fill: "#e5e5e5",
+              fill: "var(--accent)",
             }
           : {
               name: "Empty",
               value: 1,
-              fill: "#e5e5e5",
+              fill: "var(--accent)",
             },
       ],
     },
@@ -77,12 +78,12 @@ const DataPieCharts = () => {
           ? {
               name: "Rest",
               value: agency.properties.length - propertiesForSale || 1,
-              fill: "#e5e5e5",
+              fill: "var(--accent)",
             }
           : {
               name: "Empty",
               value: 1,
-              fill: "#e5e5e5",
+              fill: "var(--accent)",
             },
       ],
     },
@@ -95,12 +96,12 @@ const DataPieCharts = () => {
           ? {
               name: "Listed",
               value: agency.properties.length - pendingProperties || 1,
-              fill: "#e5e5e5",
+              fill: "var(--accent)",
             }
           : {
               name: "Empty",
               value: 1,
-              fill: "#e5e5e5",
+              fill: "var(--accent)",
             },
       ],
     },
@@ -111,7 +112,7 @@ const DataPieCharts = () => {
       {propertiesData.map((data) => (
         <div
           key={data.title}
-          className="flex h-32 lg:h-40 items-center bg-sidebar rounded-xl px-8 p-4"
+          className="flex h-32 lg:h-40 items-center border border-sidebar-border rounded-xl px-8 p-4"
         >
           <div className="space-y-1 w-1/2">
             <p className="lg:text-lg">{data.title}</p>
@@ -122,9 +123,12 @@ const DataPieCharts = () => {
               <PieChart>
                 <Pie
                   dataKey="value"
+                  startAngle={90}
+                  endAngle={450}
                   data={data.chart}
                   innerRadius={10}
                   outerRadius={40}
+                  stroke="var(--accent)"
                   cx="50%"
                   cy="50%"
                 />

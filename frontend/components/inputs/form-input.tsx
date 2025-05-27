@@ -9,10 +9,12 @@ import {
 } from "../ui/form";
 import { Input, InputProps } from "../ui/input";
 import { useFormContext } from "react-hook-form";
+import { Textarea } from "../ui/textarea";
 
 interface FormInputProps extends InputProps {
   name: string;
   label: string;
+  variant?: "textarea" | "input";
   icon?: ReactNode;
   description?: string;
 }
@@ -30,16 +32,15 @@ const FormInput = (props: FormInputProps) => {
             {props.label} {props.icon}
           </FormLabel>
           <FormControl>
-            <Input
-              type={props.type}
-              className={props.className}
-              defaultValue={props.defaultValue}
-              size={props.size}
-              placeholder={props.placeholder}
-              {...field}
-            />
+            {!props.variant || props.variant === "input" ? (
+              <Input {...props} {...field} />
+            ) : (
+              <Textarea placeholder={props.placeholder} {...field} />
+            )}
           </FormControl>
-          <FormDescription>{props.description}</FormDescription>
+          {props.description && (
+            <FormDescription>{props.description}</FormDescription>
+          )}
           <FormMessage />
         </FormItem>
       )}

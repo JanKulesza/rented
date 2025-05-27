@@ -26,9 +26,9 @@ export default async function Layout({
     <AgencyProvider agency={agency}>
       <SidebarProvider>
         <AppSidebar agencyId={agencyId} />
-        <div className="w-full">
+        <div className="w-full bg-sidebar/40">
           <SidebarTrigger className="fixed bottom-2 w-10 h-10" />
-          <main className=" p-6 space-y-6">{children}</main>
+          <main className="p-2 md:p-6 space-y-6">{children}</main>
         </div>
       </SidebarProvider>
     </AgencyProvider>
