@@ -15,7 +15,6 @@ export default async function Layout({
   const res = await fetch(`http://localhost:8080/api/agencies/${agencyId}`, {
     cache: "default",
   });
-
   if (!res.ok) return notFound();
 
   const agency = await res.json();
@@ -26,7 +25,8 @@ export default async function Layout({
     <AgencyProvider agency={agency}>
       <SidebarProvider>
         <AppSidebar agencyId={agencyId} />
-        <div className="w-full bg-sidebar/40">
+        {/* w-[80%] somehow enables flex-1 to work correctly, and carousel doesn't break the layout */}
+        <div className="w-[80%] flex-1 bg-sidebar/40">
           <SidebarTrigger className="fixed bottom-2 w-10 h-10" />
           <main className="sm:p-2 lg:p-6 space-y-2 lg:space-y-6">
             {children}

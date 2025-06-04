@@ -1,10 +1,11 @@
+"use client";
 import {
   agencyContext,
   Property,
   PropertyTypes,
 } from "@/components/providers/agency-provider";
 import { Dot } from "lucide-react";
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 const SRPerType = () => {
   const {
@@ -33,14 +34,14 @@ const SRPerType = () => {
           <div key={pt} className="mb-3">
             <div className="flex items-center justify-between text-sm mb-0">
               <span className="flex items-center">
-                {pt} <Dot />{" "}
+                {pt} <Dot />
                 <span className="text-muted-foreground">{p.length} listed</span>
               </span>
               <span>{pDiff.toFixed()}%</span>
             </div>
-            <div className="rounded-xl bg-accent h-1.5 my-2 overflow-hidden">
+            <div className="rounded-xl bg-accent h-1.5 my-2">
               <div
-                className="h-full"
+                className="h-full rounded-xl"
                 style={{
                   // Inline style for dynamic values
                   width: `${pDiff.toFixed(1)}%`,
