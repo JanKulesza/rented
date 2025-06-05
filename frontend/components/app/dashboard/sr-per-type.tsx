@@ -4,6 +4,7 @@ import {
   Property,
   PropertyTypes,
 } from "@/components/providers/agency-provider";
+import { Progress } from "@/components/ui/progress";
 import { Dot } from "lucide-react";
 import { useContext } from "react";
 
@@ -22,7 +23,7 @@ const SRPerType = () => {
     [PropertyTypes.INDUSTRIAL]: "#F87171", // red-400
   };
   return (
-    <>
+    <div className="flex flex-col justify-between gap-4">
       {Object.values(PropertyTypes).map((pt) => {
         const p = (properties as Property[]).filter(
           (p) => p.propertyType === pt
@@ -31,7 +32,7 @@ const SRPerType = () => {
         const pDiff = p.length === 0 ? 0 : (ps.length / p.length) * 100;
         const color = TYPE_COLORS[pt];
         return (
-          <div key={pt} className="mb-3">
+          <div key={pt}>
             <div className="flex items-center justify-between text-sm mb-0">
               <span className="flex items-center">
                 {pt} <Dot />
@@ -39,20 +40,11 @@ const SRPerType = () => {
               </span>
               <span>{pDiff.toFixed()}%</span>
             </div>
-            <div className="rounded-xl bg-accent h-1.5 my-2">
-              <div
-                className="h-full rounded-xl"
-                style={{
-                  // Inline style for dynamic values
-                  width: `${pDiff.toFixed(1)}%`,
-                  backgroundColor: color,
-                }}
-              />
-            </div>
+            <Progress value={pDiff} className="bg-accent" color={color} />
           </div>
         );
       })}
-    </>
+    </div>
   );
 };
 

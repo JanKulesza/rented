@@ -9,22 +9,26 @@ import PropertyCarousel from "@/components/app/dashboard/property-carousel";
 import LatestSales from "@/components/app/dashboard/latest-sales";
 import TopAgents from "@/components/app/dashboard/top-agents";
 
-const AgencyDashboard = ({ params }: { params: { agencyId: string } }) => {
-  const { agencyId } = params;
+const AgencyDashboard = async ({
+  params,
+}: {
+  params: { agencyId: string };
+}) => {
+  const { agencyId } = await params;
 
   return (
     <>
       <section className="grid sm:grid-cols-2 xl:grid-cols-4 w-full justify-center sm:justify-between gap-2 lg:gap-8">
         <DataPieCharts />
       </section>
-      <section className="flex max-lg:flex-col gap-2 lg:gap-8">
+      <section className="flex max-lg:flex-col gap-2 lg:gap-8 h-[500px]">
         <div className="border border-sidebar-border lg:w-2/3 rounded-xl p-4 sm:p-6 xl:p-8">
           <h6 className="font-semibold text-xl mb-5">Properties listed</h6>
           <div className="w-full h-96 overflow-hidden">
             <PropertiesListedChart />
           </div>
         </div>
-        <div className=" border border-sidebar-border lg:w-1/3 rounded-xl p-4 sm:p-6 xl:p-8">
+        <div className=" border border-sidebar-border lg:w-1/3 rounded-xl overflow-y-auto p-4 sm:p-6 xl:p-8">
           <h6 className="font-semibold text-xl mb-5">S&R Per Property Type</h6>
           <SRPerType />
         </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import NavBar from "@/components/elements/navbar";
+import NavBar from "@/components/layout/navbar";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import AuthProvider from "@/components/providers/auth-provider";
 

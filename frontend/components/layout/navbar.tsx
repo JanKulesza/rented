@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { authContext } from "../providers/auth-provider";
 import { usePathname } from "next/navigation";
-import ProfileDropdown from "./profile-dropdown";
+import ProfileDropdown from "../elements/profile-dropdown";
 
 const NavBar = () => {
   const { user } = useContext(authContext);

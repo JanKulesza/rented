@@ -1,4 +1,4 @@
-import AppSidebar from "@/components/elements/sidebar";
+import AppSidebar from "@/components/layout/sidebar";
 import AgencyProvider from "@/components/providers/agency-provider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { notFound } from "next/navigation";
