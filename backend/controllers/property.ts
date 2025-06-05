@@ -2,6 +2,7 @@ import { type NextFunction, type Request, type Response } from "express";
 import Property from "../models/property.ts";
 import mongoose from "mongoose";
 import {
+  ListingTypes,
   propertySchema,
   type PropertySchemaType,
 } from "../utils/schemas/property.ts";
@@ -36,8 +37,11 @@ export const createProperty = async (
   res: Response,
   next: NextFunction
 ) => {
-  req.body.price = parseInt(req.body.price);
-  const { success, error } = await propertySchema.safeParseAsync({
+  req.body.price = parseFloat(req.body.price);
+  req.body.agent = ["undefined", "null"].includes(req.body.agent)
+    ? null
+    : req.body.agent;
+  const { success, error, data } = await propertySchema.safeParseAsync({
     ...req.body,
     image: req.file,
   });
@@ -56,13 +60,24 @@ export const createProperty = async (
     propertyType,
     rating,
     listingType,
-  } = req.body as PropertySchemaType;
+  } = data;
+
+  if (listingType !== ListingTypes.PENDING && !agent) {
+    res.status(400).json({ error: "Agent is required for this listing type." });
+    return;
+  }
 
   const assignedAgency = await Agency.findById(agency);
-  const assignedAgent = await User.findById(agent);
+  if (!assignedAgency) {
+    res.status(404).json({ error: "Agency not found." });
+    return;
+  }
+
   if (
-    !assignedAgency!.agents.includes(new mongoose.Types.ObjectId(agent)) &&
-    assignedAgency?.owner !== new mongoose.Types.ObjectId(agent)
+    listingType !== ListingTypes.PENDING &&
+    !assignedAgency.agents.includes(
+      new mongoose.Types.ObjectId(agent?.toString())
+    )
   ) {
     res.status(400).json({ error: "Agent does not belong to this agency." });
     return;
@@ -93,10 +108,12 @@ export const createProperty = async (
       { session }
     );
 
-    await assignedAgent!.updateOne(
-      { $push: { properties: savedProperty._id } },
-      { session }
-    );
+    if (listingType !== ListingTypes.PENDING)
+      await User.findByIdAndUpdate(
+        agent,
+        { $push: { properties: savedProperty._id } },
+        { session }
+      );
 
     await session.commitTransaction();
     res.status(201).json(savedProperty);
@@ -154,7 +171,7 @@ export const updateProperty = async (
     price,
     propertyType,
     rating,
-    listing,
+    listingType,
   } = req.body as Partial<PropertySchemaType>;
 
   const updateData: Partial<PropertySchemaType> = {
@@ -164,7 +181,7 @@ export const updateProperty = async (
     price,
     propertyType,
     rating,
-    listing,
+    listingType,
   };
 
   const session = await mongoose.startSession();

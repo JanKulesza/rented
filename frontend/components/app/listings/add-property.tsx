@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/select";
 import {
   agencyContext,
+  ListingTypes,
+  Property,
   PropertyTypes,
 } from "@/components/providers/agency-provider";
 import { useContext, useState } from "react";
@@ -43,8 +45,14 @@ import Image from "next/image";
 import { authContext, User } from "@/components/providers/auth-provider";
 import userPlaceholder from "@/public/user-placeholder.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Spinner from "@/components/ui/spinner";
 
-const AddProperty = () => {
+interface AddPropertyProps {
+  setProperties: (properties: Property[]) => void;
+  properties: Property[];
+}
+
+const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
   const {
     agency,
     agency: { agents },
@@ -52,30 +60,56 @@ const AddProperty = () => {
   const { fetchWithAuth } = useContext(authContext);
   const [isStatusPending, setIsStatusPending] = useState(false);
   const [tab, setTab] = useState<"step1" | "step2">("step1");
+  const [isOpen, setIsOpen] = useState(false);
   const form = useForm<AddPropertySchemaType>({
     resolver: zodResolver(addPropertySchema),
   });
   const onSubmit = async (values: AddPropertySchemaType) => {
+    const previousProperties = properties;
     try {
       const formData = new FormData();
       for (const key in values) formData.append(key, values[key]);
       formData.append("agency", agency._id);
 
-      const { res, data } = await fetchWithAuth(
+      setProperties([
+        {
+          ...values,
+          _id: "dummy", // Placeholder, will be replaced by server response
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          rating: 0,
+          isSold: false,
+          agency: agency._id,
+          image: { url: URL.createObjectURL(values.image), id: "dummy" }, // Will be replaced by server response
+        } as Property,
+        ...previousProperties,
+      ]);
+      setIsOpen(false);
+      setTab("step1");
+
+      const { res, data } = await fetchWithAuth<Property>(
         "http://localhost:8080/api/properties",
         {
           method: "POST",
           body: formData,
         }
       );
-      console.log(res);
-      console.log(data);
+
+      if (res.ok) {
+        form.reset();
+        setIsStatusPending(false);
+        setProperties([data, ...previousProperties]);
+        setIsOpen(false);
+      } else {
+        setProperties(previousProperties);
+      }
     } catch (error) {
+      setProperties(previousProperties);
       console.log(error);
     }
   };
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus /> Add Property
@@ -259,7 +293,7 @@ const AddProperty = () => {
                 <Button variant="secondary">Close</Button>
               </DialogClose>
               {tab === "step2" ? (
-                <Button type="submit">Create</Button>
+                <Button type="submit">Create Property</Button>
               ) : (
                 <Button asChild>
                   <button type="button" onClick={() => setTab("step2")}>

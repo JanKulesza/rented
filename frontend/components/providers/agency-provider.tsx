@@ -19,7 +19,7 @@ export enum ListingTypes {
   PENDING = "Pending",
 }
 
-export interface Property {
+interface PropertyBase {
   _id: string;
   name: string;
   image: {
@@ -28,16 +28,21 @@ export interface Property {
   };
   description: string;
   price: number;
-  listingType: ListingTypes;
   isSold: boolean;
   rating: number;
   location: string;
   agency: string | Agency;
-  agent: string | User;
   propertyType: PropertyTypes;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
+
+export type Property =
+  | (PropertyBase & { agent: null; listingType: ListingTypes.PENDING })
+  | (PropertyBase & {
+      agent: string | User;
+      listingType: ListingTypes.SALE | ListingTypes.RENT;
+    });
 
 interface Agency {
   _id: string;

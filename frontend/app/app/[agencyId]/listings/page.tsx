@@ -24,8 +24,8 @@ type FilterState = {
   type: PropertyTypes | null;
   location: string | null;
   name: string | null;
-  sortField: "name" | "price" | "createdAt" | null;
-  sortOrder: "asc" | "desc" | null;
+  sortField: "name" | "price" | "createdAt";
+  sortOrder: "asc" | "desc";
 };
 
 const ListingsPage = () => {
@@ -35,12 +35,17 @@ const ListingsPage = () => {
   const [filteredProperties, setFilteredProperties] = useState(
     properties as Property[]
   );
-  const [filter, setFilter] = useState<FilterState>({} as FilterState);
+  const DEFAULT_SORT = {
+    sortField: "createdAt",
+    sortOrder: "desc",
+  } as FilterState;
+  // Initialize filter state with default values
+  const [filter, setFilter] = useState<FilterState>(DEFAULT_SORT);
   const locationInput = useRef<HTMLInputElement>(null);
   const nameInput = useRef<HTMLInputElement>(null);
 
-  const handleFilterByType = (value: PropertyTypes) =>
-    setFilter({ ...filter, type: value });
+  const handleFilterByType = (value: PropertyTypes | "All") =>
+    setFilter({ ...filter, type: value === "All" ? null : value });
 
   const handleSearchLocation = () =>
     setFilter({
@@ -61,10 +66,8 @@ const ListingsPage = () => {
     setFilter({ ...filter, sortField: field, sortOrder: order });
   };
 
-  useEffect(() => {
-    console.log(filter);
-
-    const filtered = (properties as Property[])
+  const handleFilterProps = (properties: Property[]) => {
+    const filtered = properties
       .filter((p) => (filter.type ? p.propertyType === filter.type : true))
       .filter((p) =>
         filter.name
@@ -77,15 +80,12 @@ const ListingsPage = () => {
           : true
       );
 
-    if (!filter.sortField || !filter.sortOrder)
-      return setFilteredProperties(filtered);
-
-    const sorted = sort(filtered)[filter.sortOrder](
-      (p) => p[filter.sortField!]
-    );
+    const sorted = sort(filtered)[filter.sortOrder]((p) => p[filter.sortField]);
 
     setFilteredProperties(sorted);
-  }, [filter]);
+  };
+
+  useEffect(() => handleFilterProps(properties as Property[]), [filter]);
 
   return (
     <div className="space-y-5">
@@ -132,7 +132,7 @@ const ListingsPage = () => {
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
-              {Object.values(PropertyTypes).map((type) => (
+              {["All", ...Object.values(PropertyTypes)].map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
                 </SelectItem>
@@ -174,7 +174,12 @@ const ListingsPage = () => {
             </SelectContent>
           </Select>
         </div>
-        <AddProperty />
+        <AddProperty
+          properties={filteredProperties}
+          setProperties={(properties: Property[]) =>
+            handleFilterProps(properties)
+          }
+        />
       </div>
       <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
         {filteredProperties.map((p) => (

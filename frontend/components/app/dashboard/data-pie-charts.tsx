@@ -39,7 +39,7 @@ const DataPieCharts = () => {
       title: "Total properties",
       data: agency.properties.length,
       chart:
-        agency.properties.length === 0
+        agency.properties.length !== 0
           ? [
               {
                 name: "Properties for rent",

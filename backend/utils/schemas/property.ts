@@ -44,13 +44,15 @@ export const propertySchema = z.object({
   description: z
     .string({ required_error: "Description is required." })
     .min(5, "Provide correct description."),
-  price: z
-    .number({ required_error: "Price is required." })
-    .min(0, "Provide correct price."),
+  price: z.preprocess((val) => {
+    if (typeof val === "string" && val.trim() !== "") return Number(val);
+    return val;
+  }, z.number({ required_error: "Price is required." }).min(0, "Provide correct price.")),
   rating: z
-    .number({ required_error: "Rating is required." })
-    .min(0, "Provide correct rating.")
-    .max(100, "Provide correct rating.")
+    .preprocess((val) => {
+      if (typeof val === "string" && val.trim() !== "") return Number(val);
+      return val;
+    }, z.number({ required_error: "Rating is required." }).min(0, "Provide correct rating.").max(100, "Provide correct rating."))
     .optional(),
   listingType: z.nativeEnum(ListingTypes, {
     required_error: "Listing type is required.",
@@ -61,20 +63,16 @@ export const propertySchema = z.object({
     .min(3, "Provide correct location."),
   agency: z
     .string({ required_error: "Agency is required." })
-    .refine(async (arg) => {
-      if (!mongoose.isValidObjectId(arg)) return false;
-      return !!(await Agency.findById(arg));
-    }, "Invalid agency id."),
-  agent: z
-    .string({ required_error: "Agent is required." })
-    .optional()
-    .refine(async (arg) => {
-      if (!arg) return true;
-      if (!mongoose.isValidObjectId(arg)) return false;
-      return !!(await User.findById(arg));
-    }, "Invalid agent id."),
+    .refine((arg) => mongoose.isValidObjectId(arg), "Invalid agency id."),
+  agent: z.preprocess((val) => {
+    if (val === undefined || val === null) return null;
+    if (typeof val === "string" && (val.trim() === "" || val === "undefined")) {
+      return null;
+    }
+    return val;
+  }, z.union([z.literal(null), z.string().refine((arg) => mongoose.isValidObjectId(arg), "Invalid agent id.")])),
   propertyType: z.nativeEnum(PropertyTypes, {
-    required_error: "Name is required",
+    required_error: "Property type is required.",
   }),
 });
 

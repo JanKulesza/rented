@@ -99,7 +99,12 @@ export const createAgency = async (
     return;
   }
 
-  const agency = new Agency({ name, location, owner: owner._id });
+  const agency = new Agency({
+    name,
+    location,
+    owner: owner._id,
+    agents: [owner._id],
+  });
   owner.agency = agency._id;
 
   const session = await mongoose.startSession();
