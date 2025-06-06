@@ -45,7 +45,6 @@ import { authContext, User } from "@/components/providers/auth-provider";
 import userPlaceholder from "@/public/user-placeholder.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { ZodError } from "zod";
 
 interface AddPropertyProps {
   setProperties: (properties: Property[]) => void;

@@ -6,7 +6,6 @@ import {
   Property,
 } from "@/components/providers/agency-provider";
 import { useContext } from "react";
-import { ResponsiveContainer, Pie, Tooltip, PieChart } from "recharts";
 
 const DataPieCharts = () => {
   const { agency } = useContext(agencyContext);
