@@ -12,6 +12,7 @@ import { Form } from "../ui/form";
 import Image from "next/image";
 import Spinner from "../ui/spinner";
 import { authContext } from "../providers/auth-provider";
+import { toast } from "sonner";
 
 const SignInForm = () => {
   const router = useRouter();
@@ -31,15 +32,19 @@ const SignInForm = () => {
       setIsLoading(true);
       const res = await signin(values);
 
-      if (res.status === 200) {
+      if (res.ok) {
         router.push("/");
-      }
-      if (res.status === 401) {
+      } else if ([400, 401].includes(res.status)) {
         form.setError("email", { message: "Invalid credentials." });
         form.setError("password", { message: "Invalid credentials." });
+      } else {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          toast.error(data.error);
+        else toast.error("Unexpected error occured. Please try again later.");
       }
     } catch (error) {
-      console.log(error);
+      toast.error("Unexpected error occured. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +58,7 @@ const SignInForm = () => {
           credentials: "include",
         }
       );
-      if (res.status === 200) setGoogleCallback((await res.json()).url);
+      if (res.ok) setGoogleCallback((await res.json()).url);
     })();
   }, []);
 

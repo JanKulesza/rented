@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import FormInput from "../inputs/form-input";
 import { useRouter } from "next/navigation";
 import { authContext } from "../providers/auth-provider";
+import { toast } from "sonner";
 
 const CreateAgencyForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -35,15 +36,26 @@ const CreateAgencyForm = () => {
 
       const data = await res.json();
 
-      if (res.status === 201) {
+      if (res.ok) {
         const { email, password } = values;
         const authRes = await signin({ email, password });
 
-        if (authRes.status === 200) router.push(`/app/${data._id}`);
-        else router.push("/signin");
+        if (authRes.ok) router.push(`/app/${data._id}`);
+        else {
+          router.push("/signin");
+          toast.error(
+            "Failed to sign in. Please try signing in manually using credentials."
+          );
+        }
+      } else {
+        if ("formErrors" in data) {
+          toast.error("Invalid form data. Please check your inputs.");
+        } else if ("error" in data && typeof data.error === "string")
+          toast.error(data.error);
+        else toast.error("Unexpected error occured. Please try again later.");
       }
     } catch (error) {
-      console.log(error);
+      toast.error("Unexpected error occurred. Please try again later.");
     } finally {
       setIsLoading(false);
     }

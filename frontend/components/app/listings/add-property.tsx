@@ -36,7 +36,6 @@ import {
 } from "@/components/ui/select";
 import {
   agencyContext,
-  ListingTypes,
   Property,
   PropertyTypes,
 } from "@/components/providers/agency-provider";
@@ -45,7 +44,8 @@ import Image from "next/image";
 import { authContext, User } from "@/components/providers/auth-provider";
 import userPlaceholder from "@/public/user-placeholder.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Spinner from "@/components/ui/spinner";
+import { toast } from "sonner";
+import { ZodError } from "zod";
 
 interface AddPropertyProps {
   setProperties: (properties: Property[]) => void;
@@ -68,7 +68,9 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
     const previousProperties = properties;
     try {
       const formData = new FormData();
-      for (const key in values) formData.append(key, values[key]);
+      Object.entries(values).forEach(([key, value]) => {
+        formData.append(key, value as string | Blob);
+      });
       formData.append("agency", agency._id);
 
       setProperties([
@@ -99,13 +101,19 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
         form.reset();
         setIsStatusPending(false);
         setProperties([data, ...previousProperties]);
-        setIsOpen(false);
+        toast.success("Property added successfully!");
       } else {
         setProperties(previousProperties);
+        if ("formErrors" in data) {
+          setIsOpen(true);
+          toast.error("Invalid form data. Please check your inputs.");
+        } else if ("error" in data && typeof data.error === "string")
+          toast.error(data.error);
+        else toast.error("Unexpected error occured. Please try again later.");
       }
     } catch (error) {
+      toast.error("Unexpected error occured. Please try again later.");
       setProperties(previousProperties);
-      console.log(error);
     }
   };
   return (

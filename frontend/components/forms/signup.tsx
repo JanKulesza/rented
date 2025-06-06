@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema, SignupSchemaType } from "./signup-schema";
 import Spinner from "../ui/spinner";
 import { authContext } from "../providers/auth-provider";
+import { toast } from "sonner";
 
 const SignUpForm = () => {
   const router = useRouter();
@@ -47,30 +48,28 @@ const SignUpForm = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (res.status === 201) {
+      if (res.ok) {
         const res = await signin({ email, password });
 
-        if (res.status !== 200) {
+        if (!res.ok) {
           router.push("/signin");
-          return;
+          return toast.error(
+            "Failed to sign in. Please try signing in manually using credentials."
+          );
         }
 
         router.push("/");
-      }
-      const data = await res.json();
+      } else {
+        const data = await res.json();
 
-      if (res.status === 400 && "fieldErrors" in data)
-        for (const key in data.fieldErrors) {
-          if (key === "password") {
-            form.setError("password", { message: "Invalid password." });
-            form.setError("confirmPassword", { message: "Invalid password." });
-            continue;
-          }
-          if (key === "firstName" || key === "lastName" || key === "email")
-            form.setError(key, { message: data.fieldErrors[key] });
-        }
+        if ("formErrors" in data) {
+          toast.error("Invalid form data. Please check your inputs.");
+        } else if ("error" in data && typeof data.error === "string")
+          toast.error(data.error);
+        else toast.error("Unexpected error occured. Please try again later.");
+      }
     } catch (error) {
-      console.log(error);
+      toast.error("Unexpected error occured. Please try again later.");
     } finally {
       setIsLoading(false);
     }

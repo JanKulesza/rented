@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "@/components/layout/navbar";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import AuthProvider from "@/components/providers/auth-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({
           <AuthProvider>
             <NavBar />
             <div className="mt-[10vh]">{children}</div>
+            <Toaster />
           </AuthProvider>
         </ThemeProvider>
       </body>
