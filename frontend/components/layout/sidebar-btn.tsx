@@ -9,6 +9,7 @@ interface Props {
     title: string;
     url: string;
     icon: ReactNode;
+    disabled?: boolean;
   };
 }
 
@@ -23,7 +24,7 @@ const SidebarButton = ({ item }: Props) => {
         }`}
         asChild
       >
-        <Link href={item.url}>
+        <Link href={item.url} aria-disabled={item.disabled}>
           {item.icon}
           <span>{item.title}</span>
         </Link>

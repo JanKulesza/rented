@@ -39,8 +39,8 @@ const SidebarAgencyFooter = () => {
                 )}
               </SidebarMenuButton>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="top">
-              <DropdownMenuItem>Agency details</DropdownMenuItem>
+            <DropdownMenuContent side="top" className="bg-sidebar w-60">
+              <DropdownMenuItem disabled>Agency details</DropdownMenuItem>
               <DropdownMenuItem disabled>Billing</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

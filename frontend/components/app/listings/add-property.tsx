@@ -42,7 +42,6 @@ import {
 import { useContext, useState } from "react";
 import Image from "next/image";
 import { authContext, User } from "@/components/providers/auth-provider";
-import userPlaceholder from "@/public/user-placeholder.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
@@ -266,7 +265,7 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
                             <SelectItem key={agent._id} value={agent._id}>
                               <div className="flex gap-3 items-center">
                                 <Image
-                                  src={agent.image?.url || userPlaceholder}
+                                  src={agent.image.url}
                                   alt=""
                                   className="h-8 w-8 rounded-4xl"
                                 />

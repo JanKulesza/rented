@@ -25,24 +25,37 @@ const AppSidebar = async ({ agencyId }: { agencyId: string }) => {
   const items = [
     { title: "Dashboard", url: ROOTPATH, icon: <Home /> },
     { title: "Listings", url: `${ROOTPATH}/listings`, icon: <LayoutList /> },
+    { title: "Agents", url: `${ROOTPATH}/agents`, icon: <Users /> },
     {
       title: "Inquiries",
       url: `${ROOTPATH}/inquiries`,
       icon: <MessageCircle />,
+      disabled: true, // Temporarily disabled
     },
-    { title: "Agents", url: `${ROOTPATH}/agents`, icon: <Users /> },
     {
       title: "Analytics",
       url: `${ROOTPATH}/analytics`,
       icon: <ChartNoAxesCombined />,
+      disabled: true, // Temporarily disabled
     },
     {
       title: "Appointments",
       url: `${ROOTPATH}/appointments`,
       icon: <CalendarCheck />,
+      disabled: true, // Temporarily disabled
     },
-    { title: "Reports", url: `${ROOTPATH}/reports`, icon: <ClipboardList /> },
-    { title: "Settings", url: `${ROOTPATH}/settings`, icon: <Settings /> },
+    {
+      title: "Reports",
+      url: `${ROOTPATH}/reports`,
+      icon: <ClipboardList />,
+      disabled: true,
+    }, // Temporarily disabled
+    {
+      title: "Settings",
+      url: `${ROOTPATH}/settings`,
+      icon: <Settings />,
+      disabled: true,
+    }, // Temporarily disabled
   ];
   return (
     // Navbar height

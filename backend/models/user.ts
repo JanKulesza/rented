@@ -16,7 +16,10 @@ const userSchema = new mongoose.Schema(
         id: { type: String, required: true },
         url: { type: String, required: true },
       },
-      default: null,
+      default: {
+        id: "user-placeholder_bz04tm",
+        url: "https://res.cloudinary.com/duydunnlr/image/upload/v1749207225/user-placeholder_bz04tm.jpg",
+      },
       _id: false,
     },
     email: { type: String, required: true, unique: true },

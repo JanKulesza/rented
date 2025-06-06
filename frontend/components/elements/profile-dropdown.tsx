@@ -9,7 +9,6 @@ import {
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import Image from "next/image";
-import userPlaceholder from "@/public/user-placeholder.png";
 import {
   Building2,
   ChevronsUpDown,
@@ -35,9 +34,11 @@ const ProfileDropdown = ({ user }: { user: User }) => {
           className="flex items-center gap-3 p-8"
         >
           <Image
-            src={user.image?.url || userPlaceholder}
-            alt=""
-            className="h-11 w-11 rounded-4xl"
+            src={user.image.url}
+            alt="CN"
+            height={44}
+            width={44}
+            className="rounded-4xl"
           />
           <div className="flex flex-col items-baseline">
             <span>{user.firstName + " " + user.lastName}</span>

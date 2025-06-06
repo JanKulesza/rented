@@ -7,7 +7,7 @@ export interface User {
   _id: string;
   firstName: string;
   lastName: string;
-  image: { id: string; url: string } | null;
+  image: { id: string; url: string };
   email: string;
   agency: string | null;
   properties: string[];
