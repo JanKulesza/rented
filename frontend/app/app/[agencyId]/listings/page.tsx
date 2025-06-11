@@ -18,7 +18,7 @@ import {
 import { ArrowDown, ArrowUp, Search } from "lucide-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { sort } from "fast-sort";
-import { capitalize } from "@/lib/utils";
+import { capitalize, formatAddress } from "@/lib/utils";
 
 type FilterState = {
   type: PropertyTypes | null;
@@ -76,7 +76,9 @@ const ListingsPage = () => {
       )
       .filter((p) =>
         filter.location
-          ? p.location.toLowerCase().includes(filter.location.toLowerCase())
+          ? formatAddress(p.address)
+              .toLowerCase()
+              .includes(filter.location.toLowerCase())
           : true
       );
 
@@ -181,11 +183,17 @@ const ListingsPage = () => {
           }
         />
       </div>
-      <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
-        {filteredProperties.map((p) => (
-          <PropertyCard key={p._id} property={p} />
-        ))}
-      </div>
+      {filteredProperties.length > 0 ? (
+        <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+          {filteredProperties.map((p) => (
+            <PropertyCard key={p._id} property={p} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center mt-10 text-muted-foreground">
+          <span>There are no properties to show.</span>
+        </div>
+      )}
     </div>
   );
 };

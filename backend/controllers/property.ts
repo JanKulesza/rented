@@ -37,10 +37,6 @@ export const createProperty = async (
   res: Response,
   next: NextFunction
 ) => {
-  req.body.price = parseFloat(req.body.price);
-  req.body.agent = ["undefined", "null"].includes(req.body.agent)
-    ? null
-    : req.body.agent;
   const { success, error, data } = await propertySchema.safeParseAsync({
     ...req.body,
     image: req.file,
@@ -54,7 +50,7 @@ export const createProperty = async (
     agency,
     description,
     agent,
-    location,
+    address,
     name,
     price,
     propertyType,
@@ -89,7 +85,7 @@ export const createProperty = async (
     agency,
     description,
     agent,
-    location,
+    address,
     name,
     price,
     propertyType,
@@ -166,7 +162,7 @@ export const updateProperty = async (
     agency,
     description,
     agent,
-    location,
+    address,
     name,
     price,
     propertyType,
@@ -176,7 +172,7 @@ export const updateProperty = async (
 
   const updateData: Partial<PropertySchemaType> = {
     description,
-    location,
+    address,
     name,
     price,
     propertyType,

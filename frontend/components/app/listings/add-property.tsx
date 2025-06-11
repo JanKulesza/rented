@@ -1,16 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogHeader,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import {
   Form,
   FormDescription,
   FormField,
@@ -24,6 +14,7 @@ import { useForm } from "react-hook-form";
 import {
   addPropertySchema,
   AddPropertySchemaType,
+  addressSchema,
 } from "./add-property-schema";
 import DragZone from "@/components/elements/drag-zone";
 import FormInput from "@/components/inputs/form-input";
@@ -36,18 +27,37 @@ import {
 } from "@/components/ui/select";
 import {
   agencyContext,
+  ListingTypes,
   Property,
   PropertyTypes,
 } from "@/components/providers/agency-provider";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import Image from "next/image";
 import { authContext, User } from "@/components/providers/auth-provider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Progress } from "@/components/ui/progress";
+import "leaflet/dist/leaflet.css";
+import dynamic from "next/dynamic";
 
 interface AddPropertyProps {
   setProperties: (properties: Property[]) => void;
   properties: Property[];
+}
+
+enum TabEnum {
+  Info = "info",
+  Location = "location",
+  Details = "details",
 }
 
 const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
@@ -56,20 +66,60 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
     agency: { agents },
   } = useContext(agencyContext);
   const { fetchWithAuth } = useContext(authContext);
+
   const [isStatusPending, setIsStatusPending] = useState(false);
-  const [tab, setTab] = useState<"step1" | "step2">("step1");
+  const [tab, setTab] = useState<TabEnum>(TabEnum.Info);
   const [isOpen, setIsOpen] = useState(false);
+  const [locationCorrect, setLocationCorrect] = useState(false);
+
+  const Map = useMemo(
+    () =>
+      dynamic(() => import("@/components/elements/map"), {
+        loading: () => <p>A map is loading</p>,
+        ssr: false,
+      }),
+    []
+  );
+
   const form = useForm<AddPropertySchemaType>({
     resolver: zodResolver(addPropertySchema),
+    defaultValues: {
+      agent: "",
+      address: {
+        address: "",
+        suite: "",
+        city: "",
+        state: "",
+        country: "",
+        zip: "",
+      },
+      name: "",
+      description: "",
+      price: 0,
+      propertyType: PropertyTypes.APARTAMENT,
+      listingType: ListingTypes.RENT,
+    },
   });
+
   const onSubmit = async (values: AddPropertySchemaType) => {
     const previousProperties = properties;
     try {
       const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        formData.append(key, value as string | Blob);
-      });
+      formData.append("name", values.name);
+      formData.append("description", values.description);
+      formData.append("price", String(values.price));
+      formData.append("listingType", values.listingType);
+      formData.append("propertyType", values.propertyType);
+
+      if (values.agent) formData.append("agent", values.agent);
+
       formData.append("agency", agency._id);
+      formData.append("image", values.image, values.image.name);
+
+      // Append nested address fields using bracket notation
+      Object.entries(values.address).forEach(([field, val]) => {
+        formData.append(`address[${field}]`, String(val));
+      });
 
       setProperties([
         {
@@ -85,7 +135,7 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
         ...previousProperties,
       ]);
       setIsOpen(false);
-      setTab("step1");
+      setTab(TabEnum.Info);
 
       const { res, data } = await fetchWithAuth<Property>(
         "http://localhost:8080/api/properties",
@@ -114,50 +164,30 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
       setProperties(previousProperties);
     }
   };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger asChild>
         <Button>
           <Plus /> Add Property
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add property</DialogTitle>
-          <DialogDescription>
-            Fill out the form to add property
-          </DialogDescription>
-        </DialogHeader>
+      </SheetTrigger>
+      <SheetContent className="w-9/10 md:w-3/5 md:max-w-9/10 overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Add property</SheetTitle>
+          <SheetDescription>Fill out the form to add property</SheetDescription>
+        </SheetHeader>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit, () => {
               const { image, name, description } = form.formState.errors;
-              if (image || name || description) setTab("step1");
+              if (image || name || description) setTab(TabEnum.Info);
             })}
+            className="flex flex-col justify-between h-full"
           >
-            <Tabs className="space-y-3 w-full" value={tab}>
-              <TabsList className="w-full p-0">
-                <TabsTrigger
-                  onClick={() => {
-                    setTab("step1");
-                  }}
-                  value="step1"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  Step 1
-                </TabsTrigger>
-                <TabsTrigger
-                  onClick={() => {
-                    setTab("step2");
-                  }}
-                  value="step2"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  Step 2
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="step1" className="space-y-5">
-                <DragZone height={250} className="mb-5" />
+            <Tabs className="px-4" value={tab}>
+              <TabsContent value="info" className="space-y-6">
+                <DragZone height={300} className="mb-5" />
                 <FormInput
                   name="name"
                   label="Name"
@@ -170,12 +200,58 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
                   placeholder="Tell something about property..."
                 />
               </TabsContent>
-              <TabsContent value="step2" className="space-y-5">
-                <FormInput
-                  name="location"
-                  label="Location"
-                  placeholder="Enter property location"
+              <TabsContent
+                value={TabEnum.Location}
+                className="flex max-md:flex-col gap-6"
+              >
+                <div className="md:w-2/3 space-y-6 ">
+                  <FormInput
+                    name="address.address"
+                    label="Address"
+                    placeholder="Address"
+                  />
+                  <FormInput
+                    name="address.suite"
+                    label="Suite"
+                    placeholder="Suite (optional)"
+                  />
+                  <FormInput
+                    name="address.city"
+                    label="City"
+                    placeholder="City"
+                  />
+                  <FormInput
+                    name="address.state"
+                    label="State"
+                    placeholder="State"
+                  />
+                  <FormInput
+                    name="address.country"
+                    label="Country"
+                    placeholder="Country"
+                  />
+                  <FormInput
+                    name="address.zip"
+                    label="Zip Code"
+                    placeholder="Zip Code"
+                  />
+                </div>
+                <Map
+                  addr={form.watch("address")}
+                  useRecenter
+                  onRecenter={(location) => {
+                    if (!location) setLocationCorrect(false);
+                    else {
+                      console.log(location);
+
+                      form.setValue("address.lat", +location.lat);
+                      form.setValue("address.lon", +location.lon);
+                      setLocationCorrect(true);
+                    }
+                  }}
                 />
+              </TabsContent>
+              <TabsContent value={TabEnum.Details} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="propertyType"
@@ -201,40 +277,38 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-3">
-                  <FormInput
-                    name="price"
-                    type="number"
-                    label="Price"
-                    placeholder="Enter price"
-                  />
-                  <FormField
-                    control={form.control}
-                    name="listingType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Listing Type</FormLabel>
-                        <Select
-                          onValueChange={(value) => {
-                            setIsStatusPending(value === "Pending");
-                            field.onChange(value);
-                          }}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Listing type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Rent">Rent</SelectItem>
-                            <SelectItem value="Sale">Sale</SelectItem>
-                            <SelectItem value="Pending">Pending</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormInput
+                  name="price"
+                  type="number"
+                  label="Price"
+                  placeholder="Enter price"
+                />
+                <FormField
+                  control={form.control}
+                  name="listingType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Listing Type</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          setIsStatusPending(value === "Pending");
+                          field.onChange(value);
+                        }}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Listing type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Rent">Rent</SelectItem>
+                          <SelectItem value="Sale">Sale</SelectItem>
+                          <SelectItem value="Pending">Pending</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="agent"
@@ -266,8 +340,10 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
                               <div className="flex gap-3 items-center">
                                 <Image
                                   src={agent.image.url}
-                                  alt=""
-                                  className="h-8 w-8 rounded-4xl"
+                                  alt="CN"
+                                  height={32}
+                                  width={32}
+                                  className="rounded-4xl"
                                 />
                                 <div className="flex flex-col items-baseline">
                                   <span>
@@ -294,24 +370,83 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
                 />
               </TabsContent>
             </Tabs>
-            <DialogFooter className="mt-5">
-              <DialogClose asChild>
-                <Button variant="secondary">Close</Button>
-              </DialogClose>
-              {tab === "step2" ? (
-                <Button type="submit">Create Property</Button>
-              ) : (
-                <Button asChild>
-                  <button type="button" onClick={() => setTab("step2")}>
-                    Next
-                  </button>
+            <SheetFooter>
+              <Progress
+                className="w-full mb-3"
+                value={
+                  (100 / Object.values(TabEnum).length) *
+                  (Object.values(TabEnum).indexOf(tab) + 1)
+                }
+              />
+              <div className="flex justify-between">
+                <Button
+                  variant="secondary"
+                  disabled={tab === TabEnum.Info}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setTab(
+                      Object.values(TabEnum)[
+                        Object.values(TabEnum).indexOf(tab) - 1
+                      ]
+                    );
+                  }}
+                >
+                  Previous
                 </Button>
-              )}
-            </DialogFooter>
+                {tab === TabEnum.Details ? (
+                  <Button type="submit">Create Property</Button>
+                ) : (
+                  <Button
+                    type="button"
+                    disabled={((): boolean => {
+                      switch (tab) {
+                        case TabEnum.Info:
+                          const [image, name, description] = form.watch([
+                            "image",
+                            "name",
+                            "description",
+                          ]);
+
+                          const { success } = addPropertySchema
+                            .partial()
+                            .safeParse({ image, name, description });
+
+                          if (!success) return true;
+                          break;
+                        case TabEnum.Location:
+                          console.log(form.watch("address"));
+
+                          if (
+                            !addressSchema.safeParse(form.watch("address"))
+                              .success ||
+                            !locationCorrect
+                          )
+                            return true;
+                          break;
+                        default:
+                          break;
+                      }
+
+                      return false;
+                    })()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTab(
+                        Object.values(TabEnum)[
+                          Object.values(TabEnum).indexOf(tab) + 1
+                        ]
+                      );
+                    }}
+                  >
+                    Next
+                  </Button>
+                )}
+              </div>
+            </SheetFooter>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
 

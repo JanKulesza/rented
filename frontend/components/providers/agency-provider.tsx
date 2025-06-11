@@ -1,6 +1,7 @@
 "use client";
 import { createContext } from "react";
 import { User } from "./auth-provider";
+import { AddressType } from "../app/listings/add-property-schema";
 
 export enum PropertyTypes {
   APARTAMENT = "Apartment",
@@ -30,7 +31,7 @@ interface PropertyBase {
   price: number;
   isSold: boolean;
   rating: number;
-  location: string;
+  address: AddressType;
   agency: string | Agency;
   propertyType: PropertyTypes;
   createdAt: string;

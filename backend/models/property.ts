@@ -18,7 +18,20 @@ const propertySchema = new mongoose.Schema(
     listingType: { type: String, enum: ListingTypes, required: true },
     isSold: { type: Boolean, default: false },
     rating: { type: Number, default: 0, min: 0, max: 100 },
-    location: { type: String, required: true },
+    address: {
+      type: {
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        country: { type: String, required: true },
+        zip: { type: String, required: true },
+        address: { type: String, required: true },
+        lat: { type: Number, required: true, min: -90, max: 90 },
+        lon: { type: Number, required: true, min: -180, max: 180 },
+        suite: String,
+      },
+      required: true,
+      _id: false,
+    },
     agency: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Agency",

@@ -10,8 +10,8 @@ import { FormMessage } from "../ui/form";
 
 interface Props {
   className?: ClassValue;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 const DragZone = ({ className, width, height }: Props) => {
@@ -52,7 +52,7 @@ const DragZone = ({ className, width, height }: Props) => {
   return (
     <>
       <div
-        style={{ width: width ?? "100%", height: height ?? 256 }}
+        style={{ width: width ?? "100%", height: height ?? "100%" }}
         className={cn("rounded-2xl relative shadow overflow-hidden", className)}
       >
         {imageUpload ? (
@@ -83,7 +83,7 @@ const DragZone = ({ className, width, height }: Props) => {
               className={`
                       h-full
                       flex justify-center items-center
-                      border-2 border-dashed rounded-2xl
+                      border-1 rounded-2xl
                       transition-colors duration-200 ease-in-out
                       ${
                         isDragging

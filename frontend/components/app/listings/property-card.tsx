@@ -1,4 +1,5 @@
 import { ListingTypes, Property } from "@/components/providers/agency-provider";
+import { formatAddress } from "@/lib/utils";
 import { Dot, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,7 +41,7 @@ const PropertyCard = ({ property }: Props) => {
           </span>
         </div>
         <span className="text-muted-foreground  items-center flex gap-1">
-          <MapPin /> {property.location}
+          <MapPin /> {formatAddress(property.address)}
         </span>
       </div>
     </Link>
