@@ -1,19 +1,22 @@
 import { ListingTypes, Property } from "@/components/providers/agency-provider";
-import { formatAddress } from "@/lib/utils";
-import { Dot, MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-interface Props {
+interface PropertyCardProps {
   property: Property;
+  className?: string;
 }
 
-const PropertyCard = ({ property }: Props) => {
+const PropertyCard = ({ property, className }: PropertyCardProps) => {
   return (
     <Link
       href={`listings/${property._id}`}
-      className="flex flex-col min-h-96 rounded-xl overflow-hidden hover:bg-sidebar/80 duration-500 transition-all"
+      className={cn(
+        "flex flex-col min-h-96 rounded-xl overflow-hidden hover:bg-sidebar/80 duration-500 transition-all",
+        className
+      )}
     >
       <div className="relative w-full h-72 max-w-80">
         <Image

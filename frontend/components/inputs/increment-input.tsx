@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { Minus, Plus } from "lucide-react";
-import { useFormContext, Controller } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import {
   FormField,
   FormItem,

@@ -13,7 +13,6 @@ import {
   Fence,
   Home,
   Hotel,
-  MapPin,
   School,
   Store,
   Warehouse,

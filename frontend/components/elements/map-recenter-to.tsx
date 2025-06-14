@@ -55,7 +55,7 @@ const MapRecenterTo = ({ addr, onRecenter }: MapRecenterToProps) => {
           toast.error("Failed to fetch location. Please try again later.");
           onRecenter?.();
         }
-      } catch (error) {
+      } catch (_) {
         toast.error(
           "An error occurred while fetching the location. Please try again later"
         );

@@ -6,7 +6,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { TabsContent } from "@/components/ui/tabs";
-import { CalendarSync, HandCoins, MapPin, SquarePen } from "lucide-react";
+import { CalendarSync, HandCoins, SquarePen } from "lucide-react";
 import { TabEnum } from "./add-property";
 import { useFormContext } from "react-hook-form";
 

@@ -32,8 +32,7 @@ export default function TabLivingArea() {
     : [];
 
   useEffect(() => {
-    if (!isResidential)
-      for (const key in livingArea) setValue(`livingArea`, null);
+    if (!isResidential) setValue(`livingArea`, null);
     else
       for (const key in livingArea)
         setValue(

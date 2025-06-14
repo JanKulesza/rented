@@ -57,7 +57,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       didRetry = true;
 
       const newToken = await getNewToken();
-      console.log(newToken);
 
       if (newToken) {
         res = await doFetch(newToken);
@@ -89,8 +88,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     (async () => {
       try {
         let res;
-        console.log(accessToken);
-
         if (accessToken)
           res = await fetch("http://localhost:8080/api/auth/me", {
             headers: [["Authorization", `Bearer ${accessToken}`]],
@@ -104,7 +101,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(user);
         }
       } catch (error) {
-        console.log(error);
         setAccessToken(null);
         setUser(null);
       }

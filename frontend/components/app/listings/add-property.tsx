@@ -9,7 +9,6 @@ import {
   AddPropertySchemaType,
   addressSchema,
 } from "./add-property-schema";
-import FormInput from "@/components/inputs/form-input";
 import {
   agencyContext,
   ListingTypes,
@@ -18,7 +17,7 @@ import {
 } from "@/components/providers/agency-provider";
 import { useContext, useState } from "react";
 import { authContext } from "@/components/providers/auth-provider";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
   Sheet,
@@ -154,7 +153,7 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
           toast.error(data.error);
         else toast.error("Unexpected error occured. Please try again later.");
       }
-    } catch (error) {
+    } catch (_) {
       toast.error("Unexpected error occured. Please try again later.");
       setProperties(previousProperties);
     }
@@ -224,7 +223,7 @@ const AddProperty = ({ setProperties, properties }: AddPropertyProps) => {
                             "description",
                           ]);
 
-                          const { success, error } = addPropertySchema
+                          const { success } = addPropertySchema
                             .partial({
                               address: true,
                               agent: true,

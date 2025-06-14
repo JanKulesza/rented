@@ -28,7 +28,7 @@ const TabPrice = () => {
     >
       <SheetHeader className="mb-6 px-0">
         <SheetTitle className="text-2xl">
-          Finally, set your property's price
+          Finally, set your property&apos;s price
         </SheetTitle>
         <SheetDescription>You can change this anytime.</SheetDescription>
       </SheetHeader>

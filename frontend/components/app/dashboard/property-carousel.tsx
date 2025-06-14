@@ -32,9 +32,11 @@ const PropertyCarousel = () => {
     "popular"
   );
 
-  const handleFilterByType = (value: PropertyTypes) => {
+  const handleFilterByType = (value: PropertyTypes | "all") => {
     setFilteredProp(
-      (properties as Property[]).filter((p) => p.propertyType === value)
+      (properties as Property[]).filter((p) =>
+        value === "all" ? true : p.propertyType === value
+      )
     );
   };
   return (
@@ -59,6 +61,7 @@ const PropertyCarousel = () => {
               <SelectValue placeholder="Property Type" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value={"all"}>All</SelectItem>
               {Object.values(PropertyTypes).map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
@@ -69,10 +72,11 @@ const PropertyCarousel = () => {
         </div>
       </div>
 
-      <div className="px-12">
+      <div className="px-12 mt-5">
         <Carousel
+          className="h"
           opts={{
-            align: "start",
+            align: "center",
           }}
         >
           <CarouselContent>
@@ -81,10 +85,13 @@ const PropertyCarousel = () => {
               .slice(0, 19)
               .map((p) => (
                 <CarouselItem
-                  className="basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                  className="basis-full md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                   key={p._id}
                 >
-                  <PropertyCard property={p} />
+                  <PropertyCard
+                    property={p}
+                    className="justify-center items-center"
+                  />
                 </CarouselItem>
               ))}
           </CarouselContent>
