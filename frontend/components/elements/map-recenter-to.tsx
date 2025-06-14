@@ -7,9 +7,14 @@ import { Marker, useMap } from "react-leaflet";
 import { toast } from "sonner";
 import { AddressType } from "../app/listings/add-property-schema";
 
+export interface LatLon {
+  lat: number;
+  lon: string;
+}
+
 interface MapRecenterToProps {
   addr: AddressType;
-  onRecenter?: (location?: { lat: number; lon: string }) => void;
+  onRecenter?: (location?: LatLon) => void;
 }
 
 const icon = new L.Icon({

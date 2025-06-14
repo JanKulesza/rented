@@ -1,10 +1,15 @@
 import mongoose from "mongoose";
-import { ListingTypes, PropertyTypes } from "../utils/schemas/property.ts";
+import {
+  Amenity,
+  ListingTypes,
+  PropertyTypes,
+} from "../utils/schemas/property.ts";
 import { deleteImage } from "../utils/cloudinary.ts";
+
+const RENTEDMARGIN = 1.1;
 
 const propertySchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
     image: {
       type: {
         id: { type: String, required: true },
@@ -15,9 +20,11 @@ const propertySchema = new mongoose.Schema(
     },
     description: { type: String, required: true },
     price: { type: Number, required: true },
+    buyerPrice: {},
     listingType: { type: String, enum: ListingTypes, required: true },
     isSold: { type: Boolean, default: false },
     rating: { type: Number, default: 0, min: 0, max: 100 },
+    squareFootage: { type: Number, min: 1, required: true },
     address: {
       type: {
         city: { type: String, required: true },
@@ -32,6 +39,17 @@ const propertySchema = new mongoose.Schema(
       required: true,
       _id: false,
     },
+    livingArea: {
+      type: {
+        beds: { type: Number, min: 1, required: true },
+        bedrooms: { type: Number, min: 1, required: true },
+        kitchens: { type: Number, min: 1, required: true },
+        bathrooms: { type: Number, min: 1, required: true },
+      },
+      default: null,
+      _id: false,
+    },
+    amenities: { type: [String], enum: Amenity, default: [] },
     agency: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Agency",
@@ -46,6 +64,11 @@ const propertySchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+propertySchema.pre("save", function (next) {
+  this.buyerPrice = this.price * RENTEDMARGIN;
+  next();
+});
 
 propertySchema.pre(
   ["findOneAndDelete", "findOneAndUpdate"],

@@ -46,17 +46,7 @@ export const createProperty = async (
     res.status(400).json(error.formErrors);
     return;
   }
-  const {
-    agency,
-    description,
-    agent,
-    address,
-    name,
-    price,
-    propertyType,
-    rating,
-    listingType,
-  } = data;
+  const { agency, agent, listingType } = data;
 
   if (listingType !== ListingTypes.PENDING && !agent) {
     res.status(400).json({ error: "Agent is required for this listing type." });
@@ -82,16 +72,8 @@ export const createProperty = async (
   const { id, url } = await uploadImage(req.file!.path);
 
   const property = new Property({
-    agency,
-    description,
-    agent,
-    address,
-    name,
-    price,
-    propertyType,
-    rating,
+    ...data,
     image: { id, url },
-    listingType,
   });
 
   const session = await mongoose.startSession();
@@ -163,7 +145,6 @@ export const updateProperty = async (
     description,
     agent,
     address,
-    name,
     price,
     propertyType,
     rating,
@@ -173,7 +154,6 @@ export const updateProperty = async (
   const updateData: Partial<PropertySchemaType> = {
     description,
     address,
-    name,
     price,
     propertyType,
     rating,

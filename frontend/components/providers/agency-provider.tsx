@@ -1,10 +1,14 @@
 "use client";
 import { createContext } from "react";
 import { User } from "./auth-provider";
-import { AddressType } from "../app/listings/add-property-schema";
+import {
+  AddressType,
+  LivingAreaType,
+} from "../app/listings/add-property-schema";
+import { Amenity } from "@/entities/amenities";
 
 export enum PropertyTypes {
-  APARTAMENT = "Apartment",
+  APARTMENT = "Apartment",
   STUDIO = "Studio",
   HOUSE = "House",
   VILLA = "Villa",
@@ -12,6 +16,7 @@ export enum PropertyTypes {
   TOWNHOUSE = "Townhouse",
   COMMERCIAL = "Commercial",
   INDUSTRIAL = "Industrial",
+  WAREHOUSE = "Warehouse",
 }
 
 export enum ListingTypes {
@@ -22,7 +27,6 @@ export enum ListingTypes {
 
 interface PropertyBase {
   _id: string;
-  name: string;
   image: {
     id: string;
     url: string;
@@ -32,8 +36,10 @@ interface PropertyBase {
   isSold: boolean;
   rating: number;
   address: AddressType;
-  agency: string | Agency;
+  livingArea: LivingAreaType;
+  amenities: Amenity[];
   propertyType: PropertyTypes;
+  agency: string | Agency;
   createdAt: string;
   updatedAt: string;
 }

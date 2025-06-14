@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, ZoomControl } from "react-leaflet";
-import MapRecenterTo from "./map-recenter-to";
-import { LatLngExpression, LatLngLiteral } from "leaflet";
+import MapRecenterTo, { LatLon } from "./map-recenter-to";
+import { LatLngExpression } from "leaflet";
 import { AddressType } from "../app/listings/add-property-schema";
 
 interface MapPropsBase {
@@ -19,7 +19,7 @@ type MapProps =
   | (MapPropsBase & {
       useRecenter: true;
       addr: AddressType;
-      onRecenter?: (location?: LatLngLiteral) => void;
+      onRecenter?: (location?: LatLon) => void;
     });
 
 const Map = ({

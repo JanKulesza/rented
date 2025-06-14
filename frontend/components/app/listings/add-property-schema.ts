@@ -2,6 +2,7 @@ import {
   ListingTypes,
   PropertyTypes,
 } from "@/components/providers/agency-provider";
+import { Amenity } from "@/entities/amenities";
 import { z } from "zod";
 
 export const ACCEPTED_IMAGE_TYPES = [
@@ -40,10 +41,22 @@ export const addressSchema = z.object({
     .max(180, "Please provide correct longitude."),
 });
 
+const livingAreaSchema = z.object({
+  beds: z
+    .number({ required_error: "Number of beds is required." })
+    .min(1, "Please provide correct number of beds."),
+  bedrooms: z
+    .number({ required_error: "Number of bedrooms is required." })
+    .min(1, "Please provide correct number of bedrooms."),
+  bathrooms: z
+    .number({ required_error: "Number of bathrooms is required." })
+    .min(1, "Please provide correct number of bathrooms."),
+  kitchens: z
+    .number({ required_error: "Number of kitchens is required." })
+    .min(1, "Please provide correct number of kitchens."),
+});
+
 export const addPropertySchema = z.object({
-  name: z
-    .string({ required_error: "Name is required." })
-    .min(5, "Provide correct name."),
   image: z
     .instanceof(File, { message: "File is required." })
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
@@ -55,16 +68,22 @@ export const addPropertySchema = z.object({
   price: z.coerce
     .number({ required_error: "Price is required." })
     .min(0, "Provide correct price."),
+  squareFootage: z
+    .number({ required_error: "Square footage is required." })
+    .min(1, "Please provide correct square footage."),
   listingType: z.nativeEnum(ListingTypes, {
     required_error: "Listing type is required.",
   }),
-  address: addressSchema,
   propertyType: z.nativeEnum(PropertyTypes, {
     required_error: "Property type is required",
   }),
-  agent: z.string().optional(),
+  address: addressSchema,
+  livingArea: livingAreaSchema.nullable(),
+  amenities: z.array(z.nativeEnum(Amenity)),
+  agent: z.string().nullable(),
 });
 
 export type AddressType = z.infer<typeof addressSchema>;
+export type LivingAreaType = z.infer<typeof livingAreaSchema>;
 
 export type AddPropertySchemaType = z.infer<typeof addPropertySchema>;

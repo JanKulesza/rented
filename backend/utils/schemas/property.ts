@@ -1,7 +1,5 @@
-import { unknown, z } from "zod";
+import { z } from "zod";
 import mongoose from "mongoose";
-import Agency from "../../models/agency.ts";
-import User from "../../models/user.ts";
 
 export enum PropertyTypes {
   APARTAMENT = "Apartment",
@@ -12,6 +10,89 @@ export enum PropertyTypes {
   TOWNHOUSE = "Townhouse",
   COMMERCIAL = "Commercial",
   INDUSTRIAL = "Industrial",
+  WAREHOUSE = "Warehouse",
+}
+
+export enum ListingTypes {
+  SALE = "Sale",
+  RENT = "Rent",
+  PENDING = "Pending",
+}
+
+export enum Amenity {
+  // Building & Common Areas
+  Elevator = "elevator",
+  Concierge = "concierge",
+  SecuritySystem = "security_system",
+  Intercom = "intercom",
+  Gym = "gym",
+  Spa = "spa",
+  Sauna = "sauna",
+  SwimmingPool = "swimming_pool",
+  CommunityHall = "community_hall",
+  BarbecueArea = "barbecue_area",
+  Playground = "playground",
+  BicycleStorage = "bicycle_storage",
+
+  // Parking
+  Garage = "garage",
+  CoveredParking = "covered_parking",
+  ParkingSpace = "parking_space",
+  EVCharging = "ev_charging",
+
+  // Outdoor
+  Balcony = "balcony",
+  Terrace = "terrace",
+  Garden = "garden",
+  Yard = "yard",
+  RoofTerrace = "roof_terrace",
+
+  // Comfort
+  AirConditioning = "air_conditioning",
+  CentralHeating = "central_heating",
+  UnderfloorHeating = "underfloor_heating",
+  Fireplace = "fireplace",
+  CeilingFans = "ceiling_fans",
+  DoubleGlazing = "double_glazing",
+
+  // Appliances
+  Dishwasher = "dishwasher",
+  WashingMachine = "washing_machine",
+  Dryer = "dryer",
+  Oven = "oven",
+  Microwave = "microwave",
+  Refrigerator = "refrigerator",
+
+  // Technology & Connectivity
+  HighSpeedInternet = "high_speed_internet",
+  FiberOptic = "fiber_optic",
+  SmartHomeSystem = "smart_home_system",
+  CableTV = "cable_tv",
+
+  // Storage
+  StorageRoom = "storage_room",
+  Basement = "basement",
+  Attic = "attic",
+  WalkInCloset = "walk_in_closet",
+
+  // Safety & Accessibility
+  WheelchairAccess = "wheelchair_access",
+  VideoIntercom = "video_intercom",
+  Alarm = "alarm",
+  SmokeDetectors = "smoke_detectors",
+
+  // Eco & Sustainability
+  SolarPanels = "solar_panels",
+  GreenBuilding = "green_building",
+  RainwaterHarvesting = "rainwater_harvesting",
+
+  // Other
+  Furnished = "furnished",
+  PetFriendly = "pet_friendly",
+  Soundproofing = "soundproofing",
+  HighCeilings = "high_ceilings",
+  HardwoodFloors = "hardwood_floors",
+  AccessibleLocation = "accessible_location",
 }
 
 export const ACCEPTED_IMAGE_TYPES = [
@@ -22,14 +103,12 @@ export const ACCEPTED_IMAGE_TYPES = [
   "image/svg+xml",
 ];
 
-export enum ListingTypes {
-  SALE = "Sale",
-  RENT = "Rent",
-  PENDING = "Pending",
-}
-
 const nonEmptyStr = (val: unknown) =>
-  typeof val === "string" && val.trim() !== "" ? Number(val) : null;
+  typeof val === "string" && val.trim() !== ""
+    ? !["undefined", "null"].includes(val)
+      ? Number(val)
+      : null
+    : null;
 
 export const addressSchema = z.object({
   city: z
@@ -65,10 +144,34 @@ export const addressSchema = z.object({
   ),
 });
 
+const livingAreaSchema = z.object({
+  beds: z.preprocess(
+    nonEmptyStr,
+    z
+      .number({ required_error: "Number of beds is required." })
+      .min(1, "Please provide correct number of beds.")
+  ),
+  bedrooms: z.preprocess(
+    nonEmptyStr,
+    z
+      .number({ required_error: "Number of bedrooms is required." })
+      .min(1, "Please provide correct number of bedrooms.")
+  ),
+  bathrooms: z.preprocess(
+    nonEmptyStr,
+    z
+      .number({ required_error: "Number of bathrooms is required." })
+      .min(1, "Please provide correct number of bathrooms.")
+  ),
+  kitchens: z.preprocess(
+    nonEmptyStr,
+    z
+      .number({ required_error: "Number of kitchens is required." })
+      .min(1, "Please provide correct number of kitchens.")
+  ),
+});
+
 export const propertySchema = z.object({
-  name: z
-    .string({ required_error: "Name is required." })
-    .min(5, "Provide correct name."),
   image: z
     .any({ required_error: "File is required." })
     .optional()
@@ -99,8 +202,30 @@ export const propertySchema = z.object({
   listingType: z.nativeEnum(ListingTypes, {
     required_error: "Listing type is required.",
   }),
+  propertyType: z.nativeEnum(PropertyTypes, {
+    required_error: "Property type is required.",
+  }),
   isSold: z.boolean().optional().default(false),
+  squareFootage: z.preprocess(
+    nonEmptyStr,
+    z
+      .number({ required_error: "Square footage is required." })
+      .min(1, "Please provide correct square footage.")
+  ),
   address: addressSchema,
+  livingArea: z.preprocess(
+    (val) => (val === "null" ? null : val),
+    livingAreaSchema.nullable()
+  ),
+  amenities: z.preprocess(
+    (val) =>
+      typeof val === "string" && val.trim() !== ""
+        ? !["undefined", "null"].includes(val)
+          ? val.split(",")
+          : null
+        : null,
+    z.array(z.nativeEnum(Amenity))
+  ),
   agency: z
     .string({ required_error: "Agency is required." })
     .refine((arg) => mongoose.isValidObjectId(arg), "Invalid agency id."),
@@ -111,9 +236,6 @@ export const propertySchema = z.object({
 
     return val;
   }, z.union([z.literal(null), z.string().refine((arg) => mongoose.isValidObjectId(arg), "Invalid agent id.")])),
-  propertyType: z.nativeEnum(PropertyTypes, {
-    required_error: "Property type is required.",
-  }),
 });
 
 export type AddressType = z.infer<typeof addressSchema>;

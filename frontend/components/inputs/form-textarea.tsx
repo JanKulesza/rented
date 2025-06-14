@@ -7,17 +7,17 @@ import {
   FormMessage,
   FormDescription,
 } from "../ui/form";
-import { Input, InputProps } from "../ui/input";
 import { useFormContext } from "react-hook-form";
+import { Textarea } from "../ui/textarea";
 
-interface FormInputProps extends InputProps {
+interface FormTextareaProps extends React.ComponentProps<"textarea"> {
   name: string;
   label: string;
   icon?: ReactNode;
   description?: string;
 }
 
-const FormInput = (props: FormInputProps) => {
+const FormTextArea = (props: FormTextareaProps) => {
   const form = useFormContext();
 
   return (
@@ -30,7 +30,7 @@ const FormInput = (props: FormInputProps) => {
             {props.label} {props.icon}
           </FormLabel>
           <FormControl>
-            <Input {...props} {...field} />
+            <Textarea {...props} {...field} />
           </FormControl>
           {props.description && (
             <FormDescription>{props.description}</FormDescription>
@@ -42,4 +42,4 @@ const FormInput = (props: FormInputProps) => {
   );
 };
 
-export default FormInput;
+export default FormTextArea;

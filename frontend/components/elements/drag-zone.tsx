@@ -53,7 +53,13 @@ const DragZone = ({ className, width, height }: Props) => {
     <>
       <div
         style={{ width: width ?? "100%", height: height ?? "100%" }}
-        className={cn("rounded-2xl relative shadow overflow-hidden", className)}
+        className={cn(
+          `rounded-2xl relative shadow-xs overflow-hidden border ${
+            isDragging ? "border-primary bg-blue-50" : "border-input"
+          }
+          ${form.formState.errors.image && "border-destructive bg-red-50"}`,
+          className
+        )}
       >
         {imageUpload ? (
           <>
@@ -61,7 +67,7 @@ const DragZone = ({ className, width, height }: Props) => {
               src={imageUpload}
               alt="preview"
               fill
-              className="object-cover "
+              className="object-contain"
               unoptimized
             />
             <Button
@@ -82,19 +88,12 @@ const DragZone = ({ className, width, height }: Props) => {
               htmlFor="image"
               className={`
                       h-full
+                      text-muted-foreground
                       flex justify-center items-center
-                      border-1 rounded-2xl
+                      rounded-2xl
                       transition-colors duration-200 ease-in-out
-                      ${
-                        isDragging
-                          ? "border-primary text-primary bg-blue-50"
-                          : "border-gray-300"
-                      }
-                      ${
-                        form.formState.errors.image
-                          ? "border-destructive text-destructive bg-red-50"
-                          : ""
-                      }
+                      ${isDragging && "text-primary"}
+                      ${form.formState.errors.image && "text-destructive"}
                       cursor-pointer
                     `}
               onDragOver={handleDragOver}
