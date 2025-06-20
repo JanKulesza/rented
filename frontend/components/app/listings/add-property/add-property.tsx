@@ -193,6 +193,7 @@ const AddProperty = ({
         toast.error("Unexpected error occured. Please try again later.");
       }
     } else {
+      formData.append("agency", agencyId);
       const previousProperties = properties;
       setProperties([
         {
@@ -227,6 +228,8 @@ const AddProperty = ({
           setProperties(previousProperties);
           if ("formErrors" in data) {
             setIsOpen(true);
+            console.log(data);
+
             toast.error(`Invalid form data. Please check your inputs.`);
           } else if ("error" in data && typeof data.error === "string")
             toast.error(data.error);
