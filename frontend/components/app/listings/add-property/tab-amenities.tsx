@@ -1,5 +1,5 @@
 import { TabsContent } from "@/components/ui/tabs";
-import React from "react";
+import React, { Fragment } from "react";
 import { TabEnum } from "./add-property";
 import {
   SheetHeader,
@@ -24,7 +24,7 @@ const TabAmenities = () => {
         <SheetDescription>Make your offer stand out.</SheetDescription>
       </SheetHeader>
       {Object.values(AmenityMappings).map((type) => (
-        <>
+        <Fragment key={type.label}>
           <h3 className="text-xl font-semibold mb-3">{type.label}</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {type.values.map((am) => {
@@ -50,7 +50,7 @@ const TabAmenities = () => {
               );
             })}
           </div>
-        </>
+        </Fragment>
       ))}
     </TabsContent>
   );

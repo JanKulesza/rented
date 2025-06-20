@@ -74,6 +74,7 @@ propertySchema.pre(
   ["findOneAndDelete", "findOneAndUpdate"],
   async function (next) {
     const doc = await this.model.findOne(this.getQuery());
+
     if (doc && doc.image?.id) {
       await deleteImage(doc.image.id);
     }

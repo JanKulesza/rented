@@ -121,7 +121,7 @@ export const updateProperty = async (
     return;
   }
 
-  const { success, error } = await propertySchema
+  const { success, data, error } = await propertySchema
     .partial()
     .superRefine(({ agency }, ctx) => {
       if (agency) {
@@ -141,7 +141,6 @@ export const updateProperty = async (
   }
 
   const {
-    agency,
     description,
     agent,
     address,
@@ -149,7 +148,12 @@ export const updateProperty = async (
     propertyType,
     rating,
     listingType,
-  } = req.body as Partial<PropertySchemaType>;
+    amenities,
+    image,
+    isSold,
+    livingArea,
+    squareFootage,
+  } = data;
 
   const updateData: Partial<PropertySchemaType> = {
     description,
@@ -158,15 +162,26 @@ export const updateProperty = async (
     propertyType,
     rating,
     listingType,
+    amenities,
+    image,
+    isSold,
+    livingArea,
+    squareFootage,
   };
 
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    if (agent && agent !== property.agent.toString()) {
+    if (agent && (agent !== property.agent?.toString() || !property.agent)) {
       const assignedAgent = await User.findById(agent);
-      if (agency !== assignedAgent?.agency || !assignedAgent) {
-        res.status(400).json("Agent does not belong to this agency.");
+
+      if (
+        property.agency.toString() !== assignedAgent?.agency.toString() ||
+        !assignedAgent
+      ) {
+        res
+          .status(400)
+          .json({ error: "Agent does not belong to this agency." });
         return;
       }
 
@@ -177,6 +192,13 @@ export const updateProperty = async (
         );
 
       updateData.agent = agent;
+    } else if (!agent && listingType === ListingTypes.PENDING) {
+      await User.findByIdAndUpdate(
+        property.agent,
+        { $pull: { properties: property._id } },
+        { session }
+      );
+      updateData.agent = null;
     }
 
     if (req.file) {
@@ -187,13 +209,12 @@ export const updateProperty = async (
     const updatedProperty = await Property.findByIdAndUpdate(id, updateData, {
       new: true,
       session,
-    });
+    }).populate(["agent", "agency"]);
 
     await session.commitTransaction();
     res.json(updatedProperty);
   } catch (error) {
     await session.abortTransaction();
-    if (updateData.image) await deleteImage(updateData.image.id);
     next(error);
   } finally {
     await session.endSession();

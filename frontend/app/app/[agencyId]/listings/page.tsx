@@ -1,5 +1,5 @@
 "use client";
-import AddProperty from "@/components/app/listings/add-property";
+import AddProperty from "@/components/app/listings/add-property/add-property";
 import PropertyCard from "@/components/app/listings/property-card";
 import {
   agencyContext,
@@ -19,6 +19,8 @@ import { ArrowDown, ArrowUp, Search } from "lucide-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { sort } from "fast-sort";
 import { capitalize, formatAddress } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 type FilterState = {
   type: PropertyTypes | null;
@@ -31,6 +33,7 @@ const ListingsPage = () => {
   const {
     agency: { properties },
   } = useContext(agencyContext);
+  const searchParams = useSearchParams();
   const [filteredProperties, setFilteredProperties] = useState(
     properties as Property[]
   );
@@ -75,7 +78,14 @@ const ListingsPage = () => {
     setFilteredProperties(sorted);
   };
 
-  useEffect(() => handleFilterProps(properties as Property[]), [filter]);
+  useEffect(() => {
+    const redirectStatus = searchParams.get("redirectStatus");
+
+    if (Number(redirectStatus) === 500)
+      toast.error("Unexpected error occured. Please try again later.");
+
+    handleFilterProps(properties as Property[]);
+  }, [filter]);
 
   return (
     <div className="space-y-5">

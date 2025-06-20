@@ -15,10 +15,10 @@ interface Props {
 const MiniCard = ({ image, label, info, href }: Props) => {
   return (
     <div className="flex justify-between items-center">
-      <div className="flex items-center gap-3">
-        <div className="relative h-14 w-14 flex-shrink-0">
+      <div className="flex items-center gap-5">
+        <div className="relative h-12 w-12 flex-shrink-0">
           <Image
-            className="rounded-xl object-fit"
+            className="rounded-full object-fit"
             src={image}
             alt="Agent"
             fill

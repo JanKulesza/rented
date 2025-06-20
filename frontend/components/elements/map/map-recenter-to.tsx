@@ -5,7 +5,8 @@ import L from "leaflet";
 import { useState, useEffect } from "react";
 import { Marker, useMap } from "react-leaflet";
 import { toast } from "sonner";
-import { AddressType } from "../app/listings/add-property-schema";
+import { AddressType } from "../../app/listings/add-property/add-property-schema";
+import MapMarker from "./map-marker";
 
 export interface LatLon {
   lat: number;
@@ -17,18 +18,11 @@ interface MapRecenterToProps {
   onRecenter?: (location?: LatLon) => void;
 }
 
-const icon = new L.Icon({
-  iconUrl: "/map-pin.svg",
-  iconSize: [35, 35], // size of the icon
-  iconAnchor: [16, 32], // point of the icon which will correspond to marker's location
-  popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
-});
-
 const MapRecenterTo = ({ addr, onRecenter }: MapRecenterToProps) => {
   const map = useMap();
   const [location, setLocation] = useState<L.LatLngExpression>(map.getCenter());
 
-  const { address, city, country, state, zip } = addr;
+  const { address, city, country, state, zip, lat, lon } = addr;
 
   useEffect(() => {
     if (!address || !city || !country || !state || !zip) return;
@@ -36,7 +30,15 @@ const MapRecenterTo = ({ addr, onRecenter }: MapRecenterToProps) => {
     const timeout = setTimeout(async () => {
       try {
         const res = await fetch(
-          `http://localhost:8080/api/geocode?address=${formatAddress(addr)}`
+          `http://localhost:8080/api/geocode?address=${formatAddress({
+            address,
+            city,
+            country,
+            state,
+            zip,
+            lat,
+            lon,
+          })}`
         );
 
         if (res.ok) {
@@ -66,7 +68,7 @@ const MapRecenterTo = ({ addr, onRecenter }: MapRecenterToProps) => {
       clearTimeout(timeout);
     };
   }, [address, city, state, country, zip]);
-  return <Marker position={location} icon={icon} />;
+  return <MapMarker position={location} />;
 };
 
 export default MapRecenterTo;

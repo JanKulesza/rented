@@ -73,12 +73,7 @@ const PropertyCarousel = () => {
       </div>
 
       <div className="px-12 mt-5">
-        <Carousel
-          className="h"
-          opts={{
-            align: "center",
-          }}
-        >
+        <Carousel>
           <CarouselContent>
             {sort(filteredProp)
               .desc((p) => (propSorting === "popular" ? p.rating : p.createdAt))
@@ -88,10 +83,7 @@ const PropertyCarousel = () => {
                   className="basis-full md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                   key={p._id}
                 >
-                  <PropertyCard
-                    property={p}
-                    className="justify-center items-center"
-                  />
+                  <PropertyCard property={p} />
                 </CarouselItem>
               ))}
           </CarouselContent>

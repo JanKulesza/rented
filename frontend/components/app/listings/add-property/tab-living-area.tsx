@@ -22,22 +22,28 @@ const residentialTypes = [
 ];
 
 export default function TabLivingArea() {
-  const { getValues, setValue } = useFormContext<AddPropertySchemaType>();
-  const { propertyType, livingArea } = getValues();
+  const { watch, setValue } = useFormContext<AddPropertySchemaType>();
+  const { propertyType, livingArea } = watch();
 
   const isResidential = residentialTypes.includes(propertyType);
-
   const fields = livingArea
     ? (Object.entries(livingArea) as Array<[keyof typeof livingArea, number]>)
     : [];
 
   useEffect(() => {
     if (!isResidential) setValue(`livingArea`, null);
-    else
+    else if (!livingArea) {
+      setValue("livingArea", {
+        bathrooms: 1,
+        bedrooms: 1,
+        beds: 1,
+        kitchens: 1,
+      });
+    } else
       for (const key in livingArea)
         setValue(
           `livingArea.${key as keyof LivingAreaType}`,
-          getValues(`livingArea.${key as keyof LivingAreaType}`) ?? 1
+          watch(`livingArea.${key as keyof LivingAreaType}`) ?? 1
         );
   }, [isResidential]);
 

@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "../ui/button";
 import { LucideProps } from "lucide-react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface TilePropsBase extends React.ComponentProps<"button"> {
   label: string;
@@ -34,30 +35,33 @@ const Tile = (props: TileProps) => {
     );
   return (
     <Button
-      variant="outline"
-      className={`flex ${
-        !props.info
-          ? "flex-col items-baseline"
-          : "flex-row-reverse items-center justify-between"
-      } p-3 min-h-24 h-auto min-w-48 hover:border-primary hover:text-primary transition-colors duration-300 ${
-        props.active ? "border-primary text-primary" : ""
-      }`}
       {...props}
+      variant="outline"
+      className={cn(
+        `flex ${
+          !props.info
+            ? "flex-col items-baseline"
+            : "flex-row items-center justify-between"
+        } p-3 min-h-24 h-auto min-w-48 font-semibold hover:border-primary hover:text-primary transition-colors duration-300 ${
+          props.active ? "border-primary text-primary" : ""
+        }`,
+        props.className
+      )}
     >
       {props.info ? (
         <>
-          {iconOrImage(36)}
           <div className="flex flex-col items-baseline max-w-2/3">
-            <span className="font-semibold lg:text-lg">{props.label}</span>
-            <span className="text-muted-foreground text-wrap max-lg:text-xs text-left">
+            <span className="lg:text-lg">{props.label}</span>
+            <span className="text-muted-foreground font-normal text-wrap max-lg:text-xs text-left">
               {props.info}
             </span>
           </div>
+          {iconOrImage(36)}
         </>
       ) : (
         <>
           {iconOrImage(24)}
-          <span className="font-semibold text-[1rem]">{props.label}</span>
+          <span className="text-wrap text-left">{props.label}</span>
         </>
       )}
     </Button>

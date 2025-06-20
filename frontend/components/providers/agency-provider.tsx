@@ -4,7 +4,7 @@ import { User } from "./auth-provider";
 import {
   AddressType,
   LivingAreaType,
-} from "../app/listings/add-property-schema";
+} from "../app/listings/add-property/add-property-schema";
 import { Amenity } from "@/entities/amenities";
 
 export enum PropertyTypes {
@@ -35,8 +35,9 @@ interface PropertyBase {
   price: number;
   isSold: boolean;
   rating: number;
+  squareFootage: number;
   address: AddressType;
-  livingArea: LivingAreaType;
+  livingArea: LivingAreaType | null;
   amenities: Amenity[];
   propertyType: PropertyTypes;
   agency: string | Agency;

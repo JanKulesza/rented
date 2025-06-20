@@ -19,7 +19,7 @@ const TabAddress = ({
   const form = useFormContext();
   const Map = useMemo(
     () =>
-      dynamic(() => import("@/components/elements/map"), {
+      dynamic(() => import("@/components/elements/map/map"), {
         loading: () => <Skeleton />,
         ssr: false,
       }),
@@ -59,6 +59,7 @@ const TabAddress = ({
           />
         </div>
         <Map
+          startPosition={[52.23, 21.01]}
           addr={form.watch("address")}
           useRecenter
           height="475px"

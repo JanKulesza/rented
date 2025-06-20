@@ -27,7 +27,7 @@ export default async function Layout({
         <AppSidebar agencyId={agencyId} />
         {/* w-[80%] somehow enables flex-1 to work correctly, and carousel doesn't break the layout */}
         <div className="w-[80%] flex-1 bg-sidebar/40">
-          <SidebarTrigger className="fixed bottom-2 w-10 h-10" />
+          <SidebarTrigger className="fixed bottom-2 w-10 h-10 z-50" />
           <main className="sm:p-2 lg:p-6 space-y-2 lg:space-y-6">
             {children}
           </main>
