@@ -250,7 +250,7 @@ const AddProperty = ({
             </>
           ) : (
             <>
-              <SquarePen /> Edit Property
+              <SquarePen /> Edit
             </>
           )}
         </Button>
