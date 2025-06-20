@@ -85,7 +85,7 @@ const ListingsPage = () => {
       toast.error("Unexpected error occured. Please try again later.");
 
     handleFilterProps(properties as Property[]);
-  }, [filter]);
+  }, [filter, properties]);
 
   return (
     <div className="space-y-5">

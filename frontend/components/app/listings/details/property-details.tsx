@@ -8,18 +8,10 @@ import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import Tile from "@/components/elements/tile";
 import { livingAreaMapping } from "@/entities/living-area";
-import { LivingAreaType } from "./add-property/add-property-schema";
+import { LivingAreaType } from "../add-property/add-property-schema";
 import { Separator } from "@/components/ui/separator";
-import { listingTypesMapping } from "@/entities/listing-types";
 import { AmenityMappings } from "@/entities/amenities";
-import MiniCard from "../dashboard/mini-card";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import MiniCard from "../../dashboard/mini-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
 import { Fragment, useMemo, useState } from "react";
@@ -33,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import ShowMore from "@/components/elements/show-more";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import AddProperty from "./add-property/add-property";
+import PropertyInsights from "./property-insights";
 
 interface PropertDetailsProps {
   p: Property;
@@ -54,9 +46,6 @@ const PropertyDetails = ({ p }: PropertDetailsProps) => {
   const { agencyId } = useParams();
 
   const agent = property.agent ? (property.agent as User) : null;
-  const listingTypeMap = listingTypesMapping.find(
-    (lt) => lt.type === property.listingType
-  );
 
   return (
     <div className="space-y-10 max-sm:p-2">
@@ -228,56 +217,7 @@ const PropertyDetails = ({ p }: PropertDetailsProps) => {
           </section>
         </div>
         <div className="md:w-1/3 relative">
-          <Card className="sticky top-28">
-            <CardHeader className="text-lg font-semibold">
-              Property Insights
-              <CardDescription>
-                See how this listing is performing.
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent className="space-y-6">
-              <Tile
-                label={property.listingType}
-                info="Listing type"
-                icon={listingTypeMap!.icon}
-                className="w-full dark:bg-transparent bg-transparent has-[>svg]:px-0 p-0 min-h-10 min-w-10 pointer-events-none border-none shadow-none text-primary"
-              />
-              <div
-                className="grid grid-cols-2 gap-4 text-sm opacity-30"
-                aria-disabled={true}
-              >
-                <div>
-                  <p className="text-muted-foreground">Total Views</p>
-                  <p className="text-xl font-bold">248</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Leads</p>
-                  <p className="text-xl font-bold">17</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Favorites</p>
-                  <p className="text-xl font-bold">34</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">CTR</p>
-                  <p className="text-xl font-bold">2,78%</p>
-                </div>
-                Analytics coming soon
-              </div>
-            </CardContent>
-            <CardFooter className="flex-col gap-2">
-              <AddProperty
-                className="w-full"
-                editMode
-                property={p}
-                setProperty={(p) => setProperty(p)}
-              />
-              <Button variant="secondary" className="w-full">
-                Full Analytics
-              </Button>
-            </CardFooter>
-          </Card>
+          <PropertyInsights property={p} setProperty={(p) => setProperty(p)} />
         </div>
       </div>
       <Separator />

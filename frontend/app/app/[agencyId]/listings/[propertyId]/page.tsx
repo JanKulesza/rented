@@ -1,4 +1,4 @@
-import PropertyDetails from "@/components/app/listings/property-details";
+import PropertyDetails from "@/components/app/listings/details/property-details";
 import { Property } from "@/components/providers/agency-provider";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
