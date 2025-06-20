@@ -3,7 +3,7 @@ import { formatAddress } from "@/lib/utils";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useState, useEffect } from "react";
-import { Marker, useMap } from "react-leaflet";
+import { useMap } from "react-leaflet";
 import { toast } from "sonner";
 import { AddressType } from "../../app/listings/add-property/add-property-schema";
 import MapMarker from "./map-marker";
@@ -57,7 +57,7 @@ const MapRecenterTo = ({ addr, onRecenter }: MapRecenterToProps) => {
           toast.error("Failed to fetch location. Please try again later.");
           onRecenter?.();
         }
-      } catch (_) {
+      } catch {
         toast.error(
           "An error occurred while fetching the location. Please try again later"
         );

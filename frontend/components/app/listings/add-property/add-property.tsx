@@ -188,7 +188,7 @@ const AddProperty = ({
             toast.error(data.error);
           else toast.error("Unexpected error occured. Please try again later.");
         }
-      } catch (_) {
+      } catch {
         setProperty(previousProperty);
         toast.error("Unexpected error occured. Please try again later.");
       }
@@ -228,14 +228,12 @@ const AddProperty = ({
           setProperties(previousProperties);
           if ("formErrors" in data) {
             setIsOpen(true);
-            console.log(data);
-
             toast.error(`Invalid form data. Please check your inputs.`);
           } else if ("error" in data && typeof data.error === "string")
             toast.error(data.error);
           else toast.error("Unexpected error occured. Please try again later.");
         }
-      } catch (_) {
+      } catch {
         toast.error("Unexpected error occured. Please try again later.");
         setProperties(previousProperties);
       }

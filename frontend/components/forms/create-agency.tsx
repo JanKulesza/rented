@@ -54,7 +54,7 @@ const CreateAgencyForm = () => {
           toast.error(data.error);
         else toast.error("Unexpected error occured. Please try again later.");
       }
-    } catch (error) {
+    } catch {
       toast.error("Unexpected error occurred. Please try again later.");
     } finally {
       setIsLoading(false);

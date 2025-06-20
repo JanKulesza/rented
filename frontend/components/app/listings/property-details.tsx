@@ -1,12 +1,5 @@
 "use client";
 import { ListingTypes, Property } from "@/components/providers/agency-provider";
-import { Form } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import {
-  editPropertySchema,
-  EditPropertySchema,
-} from "./add-property/edit-property-schema";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { User } from "@/components/providers/auth-provider";
 import { formatAddress } from "@/lib/utils";

@@ -1,4 +1,4 @@
-import { MapContainer, Marker, TileLayer, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, ZoomControl } from "react-leaflet";
 import MapRecenterTo, { LatLon } from "./map-recenter-to";
 import { LatLngExpression } from "leaflet";
 import { AddressType } from "../../app/listings/add-property/add-property-schema";
