@@ -62,9 +62,14 @@ export const addPropertySchema = z.object({
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
       message: "Invalid image file type",
     }),
+  name: z
+    .string({ required_error: "Name is required." })
+    .min(4, "Name too short.")
+    .max(32, "Name too long."),
   description: z
     .string({ required_error: "Description is required." })
-    .min(5, "Provide correct description."),
+    .min(5, "Description too short.")
+    .max(500, "Description too long."),
   price: z.coerce
     .number({ required_error: "Price is required." })
     .min(0, "Provide correct price."),

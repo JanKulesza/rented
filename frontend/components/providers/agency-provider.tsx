@@ -31,6 +31,7 @@ interface PropertyBase {
     id: string;
     url: string;
   };
+  name: string;
   description: string;
   price: number;
   isSold: boolean;

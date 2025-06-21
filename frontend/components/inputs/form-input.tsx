@@ -9,6 +9,7 @@ import {
 } from "../ui/form";
 import { Input, InputProps } from "../ui/input";
 import { useFormContext } from "react-hook-form";
+import { cn } from "@/lib/utils";
 
 interface FormInputProps extends InputProps {
   name: string;
@@ -25,7 +26,7 @@ const FormInput = (props: FormInputProps) => {
       control={form.control}
       name={props.name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className={cn("mx-1", props.className)}>
           <FormLabel>
             {props.label} {props.icon}
           </FormLabel>

@@ -34,7 +34,7 @@ const Map = ({
 }: MapProps) => {
   return (
     <MapContainer
-      className="w-1/3 rounded-xl overflow-hidden"
+      className="w-1/3 rounded-xl z-49 overflow-hidden"
       center={startPosition}
       zoom={zoom ?? 12}
       minZoom={5}

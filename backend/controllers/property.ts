@@ -52,6 +52,10 @@ export const createProperty = async (
     res.status(400).json({ error: "Agent is required for this listing type." });
     return;
   }
+  if (listingType === ListingTypes.PENDING && agent) {
+    res.status(400).json({ error: "Cannot assign agent to pending property." });
+    return;
+  }
 
   const assignedAgency = await Agency.findById(agency);
   if (!assignedAgency) {
@@ -141,6 +145,7 @@ export const updateProperty = async (
   }
 
   const {
+    name,
     description,
     agent,
     address,
@@ -155,7 +160,17 @@ export const updateProperty = async (
     squareFootage,
   } = data;
 
+  if (listingType !== ListingTypes.PENDING && !agent) {
+    res.status(400).json({ error: "Agent is required for this listing type." });
+    return;
+  }
+  if (listingType === ListingTypes.PENDING && agent) {
+    res.status(400).json({ error: "Cannot assign agent to pending property." });
+    return;
+  }
+
   const updateData: Partial<PropertySchemaType> = {
+    name,
     description,
     address,
     price,

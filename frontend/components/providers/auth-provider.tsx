@@ -100,7 +100,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const user = await res.json();
           setUser(user);
         }
-      } catch (error) {
+      } catch {
         setAccessToken(null);
         setUser(null);
       }

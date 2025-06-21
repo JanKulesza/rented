@@ -25,7 +25,7 @@ const FormTextArea = (props: FormTextareaProps) => {
       control={form.control}
       name={props.name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className={props.className}>
           <FormLabel>
             {props.label} {props.icon}
           </FormLabel>

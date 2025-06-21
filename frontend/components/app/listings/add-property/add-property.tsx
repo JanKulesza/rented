@@ -31,11 +31,13 @@ import TabListingTypes from "./tab-listing-types";
 import TabPropertyTypes from "./tab-property-types";
 import TabAddress from "./tab-address";
 import TabLivingArea from "./tab-living-area";
-import TabInfo from "./tab-info";
+import TabImage from "./tab-image";
 import TabAmenities from "./tab-amenities";
 import TabAgents from "./tab-agents";
 import TabPrice from "./tab-price";
 import { EditPropertySchema, editPropertySchema } from "./edit-property-schema";
+import TabDescription from "./tab-description";
+import TabName from "./tab-name";
 
 interface AddProperty {
   editMode?: false;
@@ -63,7 +65,9 @@ export enum TabEnum {
   Location = "location",
   LivingArea = "livingArea",
   Amenities = "amenities",
-  Info = "info",
+  Image = "image",
+  Name = "name",
+  Description = "description",
   Agents = "agents",
   Price = "price",
 }
@@ -95,6 +99,7 @@ const AddProperty = ({
           "_id" in property.agent
             ? property.agent._id
             : property.agent,
+        name: property.name,
         address: property.address,
         description: property.description,
         price: property.price,
@@ -139,9 +144,14 @@ const AddProperty = ({
     const formData = new FormData();
     for (const key in values) {
       const val = values[key as keyof typeof values];
-      if (val && !["address", "livingArea", "image"].includes(key))
+      if (val && !["address", "livingArea", "image", "amenities"].includes(key))
         formData.append(key, String(val));
     }
+    if (values.amenities)
+      formData.append(
+        "amenities",
+        values.amenities.length === 0 ? "[]" : String(values.amenities)
+      );
     if (values.image) formData.append("image", values.image, values.image.name);
 
     // Append nested address fields using bracket notation
@@ -258,10 +268,7 @@ const AddProperty = ({
       <SheetContent className="w-9/10 sm:w-4/5 md:w-4/5 lg:w-3/5 sm:max-w-9/10 pt-6 px-6">
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit, () => {
-              const { image, description } = form.formState.errors;
-              if (image || description) setTab(TabEnum.Info);
-            })}
+            onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-4 h-full relative"
           >
             <Tabs
@@ -277,7 +284,9 @@ const AddProperty = ({
               />
               <TabLivingArea />
               <TabAmenities />
-              <TabInfo />
+              <TabImage />
+              <TabName />
+              <TabDescription />
               <TabAgents />
               <TabPrice />
             </Tabs>
@@ -308,27 +317,33 @@ const AddProperty = ({
                     type="button"
                     disabled={((): boolean => {
                       switch (tab) {
-                        case TabEnum.Info:
-                          const [image, description] = form.watch([
-                            "image",
-                            "description",
-                          ]);
+                        case TabEnum.Image:
+                          if (editMode) return false;
+                          const image = form.watch("image");
 
-                          const { success } = addPropertySchema
-                            .partial({
-                              address: true,
-                              agent: true,
-                              amenities: true,
-                              listingType: true,
-                              livingArea: true,
-                              price: true,
-                              propertyType: true,
-                              squareFootage: true,
-                              image: !editMode ? undefined : true,
-                            })
-                            .safeParse({ image, description });
+                          const { success: sImage } = addPropertySchema
+                            .pick({ image: true })
+                            .safeParse({ image });
 
-                          if (!success) return true;
+                          if (!sImage) return true;
+                          break;
+                        case TabEnum.Name:
+                          const name = form.watch("name");
+
+                          const { success: sName } = addPropertySchema
+                            .pick({ name: true })
+                            .safeParse({ name });
+
+                          if (!sName) return true;
+                          break;
+                        case TabEnum.Description:
+                          const description = form.watch("description");
+
+                          const { success: sDescription } = addPropertySchema
+                            .pick({ description: true })
+                            .safeParse({ description });
+
+                          if (!sDescription) return true;
                           break;
                         case TabEnum.Location:
                           if (

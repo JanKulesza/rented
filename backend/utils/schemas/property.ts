@@ -181,9 +181,14 @@ export const propertySchema = z.object({
         message: "Invalid image file type",
       }
     ),
+  name: z
+    .string({ required_error: "Name is required." })
+    .min(4, "Name too short.")
+    .max(32, "Name too long."),
   description: z
     .string({ required_error: "Description is required." })
-    .min(5, "Provide correct description."),
+    .min(5, "Description too short.")
+    .max(500, "Description too long."),
   price: z.preprocess(
     nonEmptyStr,
     z
@@ -221,7 +226,9 @@ export const propertySchema = z.object({
     (val) =>
       typeof val === "string" && val.trim() !== ""
         ? !["undefined", "null"].includes(val)
-          ? val.split(",")
+          ? val === "[]"
+            ? []
+            : val.split(",")
           : null
         : null,
     z.array(z.nativeEnum(Amenity))

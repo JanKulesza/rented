@@ -35,26 +35,28 @@ const TabPropertyTypes = () => {
     [PropertyTypes.WAREHOUSE]: Warehouse,
   };
   return (
-    <TabsContent value={TabEnum.PropertyType}>
+    <TabsContent value={TabEnum.PropertyType} className="flex flex-col">
       <SheetHeader className="mb-3 px-0">
         <SheetTitle className="text-2xl">Choose property type</SheetTitle>
         <SheetDescription>
           Which type describes your place the best?
         </SheetDescription>
       </SheetHeader>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.values(PropertyTypes).map((type) => (
-          <Tile
-            key={type}
-            icon={icons[type]}
-            label={type}
-            active={form.watch("propertyType") === type}
-            onClick={(e) => {
-              e.preventDefault();
-              form.setValue("propertyType", type);
-            }}
-          />
-        ))}
+      <div className="flex flex-1 justify-center items-center">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+          {Object.values(PropertyTypes).map((type) => (
+            <Tile
+              key={type}
+              icon={icons[type]}
+              label={type}
+              active={form.watch("propertyType") === type}
+              onClick={(e) => {
+                e.preventDefault();
+                form.setValue("propertyType", type);
+              }}
+            />
+          ))}
+        </div>
       </div>
     </TabsContent>
   );

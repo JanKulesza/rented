@@ -1,8 +1,5 @@
 import PropertyDetails from "@/components/app/listings/details/property-details";
 import { Property } from "@/components/providers/agency-provider";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 const PropertDetailsPage = async ({
@@ -22,16 +19,7 @@ const PropertDetailsPage = async ({
 
   const property = (await res.json()) as Property;
 
-  return (
-    <div>
-      <Button asChild variant="ghost" className="mb-3 text-lg">
-        <Link href={`/app/${agencyId}/listings`}>
-          <ChevronLeft /> Details
-        </Link>
-      </Button>
-      <PropertyDetails p={property} />
-    </div>
-  );
+  return <PropertyDetails p={property} />;
 };
 
 export default PropertDetailsPage;

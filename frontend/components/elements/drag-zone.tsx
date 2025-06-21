@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { ClassValue } from "class-variance-authority/types";
 import { useFormContext } from "react-hook-form";
 import { FormMessage } from "../ui/form";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 interface Props {
   className?: ClassValue;
@@ -51,10 +52,11 @@ const DragZone = ({ className, width, height }: Props) => {
 
   return (
     <>
-      <div
+      <AspectRatio
+        ratio={16 / 9}
         style={{ width: width ?? "100%", height: height ?? "100%" }}
         className={cn(
-          `rounded-2xl relative shadow-xs overflow-hidden border ${
+          `rounded-2xl bg-muted/50 relative shadow-xs overflow-hidden border ${
             isDragging ? "border-primary bg-blue-50" : "border-input"
           }
           ${form.formState.errors.image && "border-destructive bg-red-50"}`,
@@ -112,7 +114,7 @@ const DragZone = ({ className, width, height }: Props) => {
             />
           </>
         )}
-      </div>
+      </AspectRatio>
       {form.formState.errors.image?.message && (
         <FormMessage>
           {form.formState.errors.image.message.toString()}
