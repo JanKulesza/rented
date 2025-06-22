@@ -25,7 +25,8 @@ import { toast } from "sonner";
 type FilterState = {
   type: PropertyTypes | null;
   location: string | null;
-  sortField: "price" | "createdAt";
+  name: string | null;
+  sortField: "name" | "price" | "createdAt";
   sortOrder: "asc" | "desc";
 };
 
@@ -44,6 +45,7 @@ const ListingsPage = () => {
   // Initialize filter state with default values
   const [filter, setFilter] = useState<FilterState>(DEFAULT_SORT);
   const locationInput = useRef<HTMLInputElement>(null);
+  const nameInput = useRef<HTMLInputElement>(null);
 
   const handleFilterByType = (value: PropertyTypes | "All") =>
     setFilter({ ...filter, type: value === "All" ? null : value });
@@ -52,6 +54,12 @@ const ListingsPage = () => {
     setFilter({
       ...filter,
       location: locationInput.current?.value ?? null,
+    });
+
+  const handleSearchName = () =>
+    setFilter({
+      ...filter,
+      name: nameInput.current?.value ?? null,
     });
 
   const handleSort = (value: string) => {
@@ -65,6 +73,11 @@ const ListingsPage = () => {
   const handleFilterProps = (properties: Property[]) => {
     const filtered = properties
       .filter((p) => (filter.type ? p.propertyType === filter.type : true))
+      .filter((p) =>
+        filter.name
+          ? p.name.toLowerCase().includes(filter.name.toLowerCase())
+          : true
+      )
       .filter((p) =>
         filter.location
           ? formatAddress(p.address)
@@ -91,6 +104,24 @@ const ListingsPage = () => {
     <div className="space-y-5">
       <div className="flex max-lg:flex-col gap-2 justify-between">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:w-2/3">
+          <div className="flex shadow-xs rounded-md h-9 overflow-hidden border-input border">
+            <Input
+              placeholder="Name"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearchName();
+              }}
+              ref={nameInput}
+              className="shadow-none rounded-none border-none focus-visible:ring-0"
+            />
+            <Button
+              onClick={handleSearchName}
+              size="icon"
+              variant="ghost"
+              className="text-muted-foreground h-full border-l border-l-input shadow-none rounded-l-none overflow-hidden rounded-r"
+            >
+              <Search />
+            </Button>
+          </div>
           <div className="flex shadow-xs rounded-md h-9 overflow-hidden border-input border">
             <Input
               placeholder="Location"
@@ -132,6 +163,7 @@ const ListingsPage = () => {
             </SelectTrigger>
             <SelectContent>
               {[
+                { name: "Name", value: "name" },
                 { name: "Price", value: "price" },
                 { name: "Created At", value: "createdAt" },
               ].map((e) => (
