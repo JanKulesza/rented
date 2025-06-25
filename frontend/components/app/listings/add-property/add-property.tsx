@@ -169,9 +169,9 @@ const AddProperty = ({
       setProperty({
         ...property,
         ...values,
-        agent: "dummy",
+        agent: "",
         image: values.image
-          ? { id: "dummy", url: URL.createObjectURL(values.image) }
+          ? { id: "", url: URL.createObjectURL(values.image) }
           : property.image,
       } as Property);
       setIsOpen(false);
@@ -208,13 +208,13 @@ const AddProperty = ({
       setProperties([
         {
           ...values,
-          _id: "dummy", // Placeholder, will be replaced by server response
+          _id: "", // Placeholder, will be replaced by server response
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           rating: 0,
           isSold: false,
           agency: agencyId,
-          image: { url: URL.createObjectURL(values.image!), id: "dummy" }, // Will be replaced by server response
+          image: { url: URL.createObjectURL(values.image!), id: "" }, // Will be replaced by server response
         } as Property,
         ...previousProperties,
       ]);
