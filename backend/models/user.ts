@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { deleteImage } from "../utils/cloudinary.ts";
 import { UserRoles } from "../utils/schemas/user.ts";
+import { serialize } from "cookie";
+import jwt from "jsonwebtoken";
 
 export enum OAuthProviders {
   GOOGLE = "google",
@@ -65,6 +67,32 @@ userSchema.methods.comparePasswords = async function (password: string) {
   return bcrypt.compare(password, user.password);
 };
 
+userSchema.methods.generateRefreshToken = function () {
+  const { _id, email, role } = this;
+  const refreshToken = jwt.sign(
+    { _id, email, role },
+    process.env.REFRESH_SECRET!,
+    {
+      expiresIn: 60 * 60 * 24 * 30,
+    }
+  );
+
+  return serialize("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 30,
+    path: "/",
+  });
+};
+
+userSchema.methods.generateAccessToken = function () {
+  const { _id, email, role } = this;
+  return jwt.sign({ _id, email, role }, process.env.ACCESS_SECRET!, {
+    expiresIn: 60 * 15,
+  });
+};
+
 userSchema.pre("save", async function (next) {
   const password = this.get("password");
   if (password) {
@@ -95,6 +123,8 @@ userSchema.pre(["findOneAndDelete", "findOneAndUpdate"], async function (next) {
 
 export interface UserDoc extends mongoose.InferSchemaType<typeof userSchema> {
   comparePasswords: (password: string) => Promise<boolean>;
+  generateRefreshToken: () => string;
+  generateAccessToken: () => string;
 }
 
 const User = mongoose.model<UserDoc>("User", userSchema);

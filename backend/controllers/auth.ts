@@ -29,26 +29,10 @@ export const signin = async (req: Request, res: Response) => {
     return;
   }
 
-  const { _id, role } = user;
+  const accessToken = user.generateAccessToken();
+  console.log(accessToken);
 
-  const payload = { _id, email, role };
-
-  const accessToken = jwt.sign(payload, process.env.ACCESS_SECRET!, {
-    expiresIn: 60 * 15,
-  });
-
-  const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET!, {
-    expiresIn: 60 * 60 * 24 * 30,
-  });
-
-  const serialized = serialize("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 60 * 60 * 24 * 30,
-    path: "/",
-  });
-  res.cookie("refreshToken", serialized);
+  res.cookie("refreshToken", user.generateRefreshToken());
 
   res.json(accessToken);
 };
@@ -98,35 +82,18 @@ export const refreshToken = async (
     }
     return next(error);
   }
-  const { _id, email, role } = payload;
+  const { _id } = payload;
+  const user = await User.findById(_id);
+  if (!user) {
+    res.status(404).json({ error: "User not found." });
+    return;
+  }
 
-  const newAccessToken = jwt.sign(
-    { _id, email, role },
-    process.env.ACCESS_SECRET!,
-    {
-      expiresIn: 60 * 15,
-    }
-  );
+  const newAccessToken = user.generateAccessToken();
   res.setHeader("Authorization", `Bearer ${newAccessToken}`);
 
-  if (payload.iat && isPast(addDays(fromUnixTime(payload.iat), 7))) {
-    const refreshToken = jwt.sign(
-      { _id, email, role },
-      process.env.REFRESH_SECRET!,
-      {
-        expiresIn: 60 * 60 * 24 * 30,
-      }
-    );
-
-    const serialized = serialize("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 30,
-      path: "/",
-    });
-    res.cookie("refreshToken", serialized);
-  }
+  if (payload.iat && isPast(addDays(fromUnixTime(payload.iat), 7)))
+    res.cookie("refreshToken", user.generateRefreshToken());
 
   res.status(200).json(newAccessToken);
 };
@@ -194,20 +161,7 @@ export const googleOAuth = async (req: Request, res: Response) => {
   });
 
   if (user) {
-    const { _id, email } = user;
-    const payload = { _id, email, role: user.role };
-    const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET!, {
-      expiresIn: 60 * 60 * 24 * 30,
-    });
-
-    const serialized = serialize("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 30,
-      path: "/",
-    });
-    res.cookie("refreshToken", serialized);
+    res.cookie("refreshToken", user.generateRefreshToken());
 
     res.redirect("http://localhost:3000");
     return;
@@ -285,28 +239,9 @@ export const createGoogleOAuthUser = async (req: Request, res: Response) => {
 
   await user.save();
 
-  const { _id, email } = user;
-  const payload = { _id, email, role };
-  const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET!, {
-    expiresIn: 60 * 60 * 24 * 30,
-  });
+  res.cookie("refreshToken", user.generateRefreshToken());
 
-  const serialized = serialize("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 60 * 60 * 24 * 30,
-    path: "/",
-  });
-  res.cookie("refreshToken", serialized);
-
-  const accessToken = jwt.sign(
-    { _id, email, role },
-    process.env.ACCESS_SECRET!,
-    {
-      expiresIn: 60 * 15,
-    }
-  );
+  const accessToken = user.generateAccessToken;
 
   res.status(200).json({ token: accessToken });
 };
