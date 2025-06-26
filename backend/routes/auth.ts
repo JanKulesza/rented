@@ -1,6 +1,7 @@
 // /api/auth
 import { Router } from "express";
 import {
+  createGoogleOAuthUser,
   getGoogleOAuthURL,
   getMe,
   googleOAuth,
@@ -20,5 +21,6 @@ router.post("/signout", auth, signout);
 
 router.get("/google/callback", getGoogleOAuthURL);
 router.get("/google/oauth", googleOAuth);
+router.post("/google/signup", createGoogleOAuthUser);
 
 export { router as authRouter };

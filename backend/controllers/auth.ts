@@ -5,7 +5,7 @@ import User, { OAuthProviders } from "../models/user.ts";
 import { parse, serialize } from "cookie";
 import { isPast, addDays, fromUnixTime } from "date-fns";
 import { OAuth2Client } from "google-auth-library";
-import { UserRoles } from "../utils/schemas/user.ts";
+import { userSchema } from "../utils/schemas/user.ts";
 
 export const signin = async (req: Request, res: Response) => {
   const { success, error } = await signinSchema.safeParseAsync(req.body);
@@ -184,27 +184,109 @@ export const googleOAuth = async (req: Request, res: Response) => {
       .json({ error: "No access token returned from user credentials." });
     return;
   }
-  const data = await getUserData(credentials.access_token);
 
-  const user = await User.findOneAndUpdate(
+  const oAuthData = await getUserData(credentials.access_token);
+
+  const user = await User.findOne({
+    email: oAuthData.email,
+    oauthId: oAuthData.sub,
+    oauthProvider: OAuthProviders.GOOGLE,
+  });
+
+  if (user) {
+    const { _id, email } = user;
+    const payload = { _id, email, role: user.role };
+    const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET!, {
+      expiresIn: 60 * 60 * 24 * 30,
+    });
+
+    const serialized = serialize("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 30,
+      path: "/",
+    });
+    res.cookie("refreshToken", serialized);
+
+    res.redirect("http://localhost:3000");
+    return;
+  }
+
+  const googleOAuthPayload = jwt.sign(
     {
-      email: data.email,
-      oauthId: data.sub,
+      firstName: oAuthData.given_name,
+      lastName: oAuthData.family_name,
+      email: oAuthData.email,
+      oauthId: oAuthData.sub,
       oauthProvider: OAuthProviders.GOOGLE,
     },
-    {
-      firstName: data.given_name,
-      lastName: data.family_name,
-      email: data.email,
-      role: UserRoles.USER,
-      oauthId: data.sub,
-      oauthProvider: OAuthProviders.GOOGLE,
-    },
-    { upsert: true, new: true }
+    process.env.JWT_SECRET!
   );
-  const { _id, email, role } = user;
-  const payload = { _id, email, role };
 
+  const serialized = serialize("googleOAuthJWT", googleOAuthPayload, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 60 * 10,
+    path: "/",
+  });
+
+  res.cookie("googleOAuthJWT", serialized);
+
+  res.redirect("http://localhost:3000/signup/google");
+};
+
+export const createGoogleOAuthUser = async (req: Request, res: Response) => {
+  const cookies = parse(req.headers.cookie ?? "");
+  const googleOAuthJWT = cookies.googleOAuthJWT
+    ? cookies.googleOAuthJWT!.split(";")[0].slice("googleOAuthJWT=".length)
+    : null;
+
+  if (!googleOAuthJWT) {
+    res.status(401).json({ error: "Access denied. No oauth access token." });
+    return;
+  }
+  let googleOAuthPayload;
+  try {
+    googleOAuthPayload = jwt.verify(
+      googleOAuthJWT!,
+      process.env.JWT_SECRET!
+    ) as jwt.JwtPayload;
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      res.status(401).json({ error: "Access denied. Token expired." });
+      return;
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      res.status(401).json({ error: "Access denied. Unauthorized user." });
+      return;
+    }
+    throw error;
+  }
+
+  const { success, error, data } = await userSchema
+    .pick({ address: true, phone: true, role: true })
+    .safeParseAsync(req.body);
+
+  if (!success) {
+    res.status(400).json(error.formErrors);
+    return;
+  }
+
+  const { address, phone, role } = data;
+
+  delete googleOAuthPayload.iat;
+  const user = new User({
+    ...googleOAuthPayload,
+    address,
+    phone,
+    role,
+  });
+
+  await user.save();
+
+  const { _id, email } = user;
+  const payload = { _id, email, role };
   const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET!, {
     expiresIn: 60 * 60 * 24 * 30,
   });
@@ -218,7 +300,15 @@ export const googleOAuth = async (req: Request, res: Response) => {
   });
   res.cookie("refreshToken", serialized);
 
-  res.redirect("http://localhost:3000");
+  const accessToken = jwt.sign(
+    { _id, email, role },
+    process.env.ACCESS_SECRET!,
+    {
+      expiresIn: 60 * 15,
+    }
+  );
+
+  res.status(200).json({ token: accessToken });
 };
 
 export const getUserData = async (accessToken: string) =>

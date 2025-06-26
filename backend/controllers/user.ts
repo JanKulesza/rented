@@ -29,22 +29,29 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const createUser = async (req: Request, res: Response) => {
-  const { success, error } = await userSchema.safeParseAsync(req.body);
+  const { success, error, data } = await userSchema.safeParseAsync(req.body);
 
   if (!success) {
     res.status(400).json(error.formErrors);
     return;
   }
 
-  const { firstName, lastName, email, password, role } =
-    req.body as UserSchemaType;
+  const { firstName, lastName, email, phone, password, address, role } = data;
 
   if (await User.findOne({ email })) {
     res.status(400).json({ error: "User already exists." });
     return;
   }
 
-  const user = new User({ firstName, lastName, email, password, role });
+  const user = new User({
+    firstName,
+    lastName,
+    email,
+    phone,
+    password,
+    address,
+    role,
+  });
   const savedUser = await user.save();
 
   res.status(201).json(savedUser);
@@ -67,7 +74,7 @@ export const updateUser = async (
     return;
   }
 
-  const { success, error } = await userSchema
+  const { success, error, data } = await userSchema
     .partial()
     .safeParseAsync({ ...req.body, image: req.file });
 
@@ -81,11 +88,13 @@ export const updateUser = async (
     firstName,
     lastName,
     password,
+    phone,
+    address,
     sold,
     role,
     agency,
     properties,
-  } = req.body as Partial<UserSchemaType>;
+  } = data;
 
   if (email && (await User.findOne({ email }))) {
     res.status(400).json({ error: "User already exists." });
@@ -97,6 +106,8 @@ export const updateUser = async (
     firstName,
     lastName,
     password,
+    phone,
+    address,
     sold,
     role,
   };

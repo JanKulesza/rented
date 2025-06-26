@@ -29,9 +29,9 @@ const propertySchema = new mongoose.Schema(
     address: {
       type: {
         city: { type: String, required: true },
-        state: { type: String, required: true },
-        country: { type: String, required: true },
-        zip: { type: String, required: true },
+        state: { type: String, required: true, min: 2 },
+        country: { type: String, required: true, min: 4 },
+        zip: { type: String, required: true, min: 3, max: 10 },
         address: { type: String, required: true },
         lat: { type: Number, required: true, min: -90, max: 90 },
         lon: { type: Number, required: true, min: -180, max: 180 },

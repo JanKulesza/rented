@@ -1,3 +1,4 @@
+"use client";
 import { ReactNode } from "react";
 import {
   FormField,
@@ -31,7 +32,7 @@ const FormInput = (props: FormInputProps) => {
             {props.label} {props.icon}
           </FormLabel>
           <FormControl>
-            <Input {...props} {...field} />
+            <Input {...props} {...field} className="" />
           </FormControl>
           {props.description && (
             <FormDescription>{props.description}</FormDescription>

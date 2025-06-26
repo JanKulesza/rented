@@ -21,7 +21,7 @@ import {
 import Link from "next/link";
 import { useContext } from "react";
 import rentedIcon from "@/app/icon.svg";
-import { UserRoles } from "../forms/signup-schema";
+import { UserRoles } from "../auth/signup-schema";
 
 const ProfileDropdown = ({ user }: { user: User }) => {
   const { signout } = useContext(authContext);

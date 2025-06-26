@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    phone: { type: String, required: true },
+    password: { type: String, required: false, min: 6, max: 32 },
+    oauthProvider: { type: String, enum: OAuthProviders },
+    oauthId: { type: String, index: true },
     image: {
       type: {
         id: { type: String, required: true },
@@ -22,10 +27,18 @@ const userSchema = new mongoose.Schema(
       },
       _id: false,
     },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: false, min: 6, max: 32 },
-    oauthProvider: { type: String, enum: OAuthProviders },
-    oauthId: { type: String, index: true },
+    address: {
+      type: {
+        city: { type: String, required: true },
+        state: { type: String, required: true, min: 2 },
+        country: { type: String, required: true, min: 4 },
+        zip: { type: String, required: true, min: 3, max: 10 },
+      },
+      required: true,
+      _id: false,
+    },
+    sold: { type: Number, min: 0, default: 0 },
+    role: { type: String, enum: UserRoles, default: "user" },
     agency: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Agency",
@@ -36,8 +49,6 @@ const userSchema = new mongoose.Schema(
       ref: "Property",
       default: [],
     },
-    sold: { type: Number, min: 0, default: 0 },
-    role: { type: String, enum: UserRoles, default: "user" },
   },
   { timestamps: true }
 );

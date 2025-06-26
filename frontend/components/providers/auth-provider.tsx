@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { UserRoles } from "../forms/signup-schema";
-import { SigninSchemaType } from "../forms/signin-schema";
+import { UserRoles } from "../auth/signup-schema";
+import { SigninSchemaType } from "../auth/signin-schema";
 
 export interface User {
   _id: string;
@@ -26,6 +26,7 @@ interface AuthContext {
   }>;
   signout: () => void;
   signin: (values: SigninSchemaType) => Promise<Response>;
+  setAuth: (token: string) => void;
 }
 
 export const authContext = React.createContext<AuthContext>({} as AuthContext);
@@ -140,8 +141,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return res;
   };
 
+  const setAuth = (token: string) => {
+    setAccessToken(token);
+  };
+
   return (
-    <authContext.Provider value={{ user, fetchWithAuth, signout, signin }}>
+    <authContext.Provider
+      value={{ user, fetchWithAuth, signout, signin, setAuth }}
+    >
       {children}
     </authContext.Provider>
   );

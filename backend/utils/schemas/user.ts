@@ -1,7 +1,5 @@
 import { z } from "zod";
 import mongoose from "mongoose";
-import Agency from "../../models/agency.ts";
-import Property from "../../models/property.ts";
 import { ACCEPTED_IMAGE_TYPES } from "./property.ts";
 
 export enum UserRoles {
@@ -9,6 +7,10 @@ export enum UserRoles {
   AGENT = "agent",
   USER = "user",
 }
+
+const phoneRegex = new RegExp(
+  /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
+);
 
 export const userSchema = z.object({
   firstName: z
@@ -20,23 +22,41 @@ export const userSchema = z.object({
   email: z
     .string({ required_error: "Email is required." })
     .email("Invalid email."),
+  phone: z
+    .string({ required_error: "Phone number is required." })
+    .regex(phoneRegex, "Invalid phone number."),
   password: z
     .string({ required_error: "Password is required." })
     .min(6, "Password must be at least 6 characters long.")
     .max(32, "Password must be less than 32 characters"),
-  role: z.nativeEnum(UserRoles, { required_error: "role is required" }),
   image: z
     .any({ required_error: "File is required." })
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.mimetype), {
       message: "Invalid image file type",
     })
     .optional(),
+  address: z.object({
+    city: z
+      .string({ required_error: "City is required." })
+      .min(1, "Provide correct city."),
+    state: z
+      .string({ required_error: "State is required." })
+      .min(2, "Provide correct state."),
+    country: z
+      .string({ required_error: "Country is required." })
+      .min(4, "Provide correct country."),
+    zip: z
+      .string({ required_error: "Zip code is required." })
+      .min(3, "Provide correct zip code.")
+      .max(10, "Zip code is too long."),
+  }),
+  role: z.nativeEnum(UserRoles, { required_error: "role is required" }),
   sold: z.number().min(0, "Invalid number,").optional(),
   agency: z
     .string({ required_error: "Agency is required." })
     .refine(async (arg) => {
       if (!mongoose.isValidObjectId(arg)) return false;
-      return !!(await Agency.findById(arg));
+      return true;
     }, "Invalid agency id.")
     .optional(),
   properties: z
@@ -45,8 +65,8 @@ export const userSchema = z.object({
       if (args.length === 0) return true;
       for (const arg of args) {
         if (!mongoose.isValidObjectId(arg)) return false;
-        return !!(await Property.findById(arg));
       }
+      return true;
     }, "Invalid property id.")
     .optional(),
 });

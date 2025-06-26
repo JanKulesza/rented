@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import skyscraper from "@/public/skyscraper.jpeg";
-import SignInForm from "@/components/forms/signin";
+import SignInForm from "@/components/auth/signin";
 
 const Signin = () => {
   return (
