@@ -30,8 +30,6 @@ export const signin = async (req: Request, res: Response) => {
   }
 
   const accessToken = user.generateAccessToken();
-  console.log(accessToken);
-
   res.cookie("refreshToken", user.generateRefreshToken());
 
   res.json(accessToken);

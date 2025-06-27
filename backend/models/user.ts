@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema(
         url: { type: String, required: true },
       },
       default: {
-        id: "user-placeholder_bz04tm",
-        url: "https://res.cloudinary.com/duydunnlr/image/upload/v1749207225/user-placeholder_bz04tm.jpg",
+        id: "user_placeholder_wdsqjq",
+        url: "https://res.cloudinary.com/duydunnlr/image/upload/v1751053567/user_placeholder_wdsqjq.png",
       },
       _id: false,
     },

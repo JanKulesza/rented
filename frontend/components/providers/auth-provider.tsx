@@ -9,10 +9,17 @@ export interface User {
   lastName: string;
   image: { id: string; url: string };
   email: string;
-  agency: string | null;
-  properties: string[];
+  phone: string;
+  address: {
+    city: string;
+    state: string;
+    country: string;
+    zip: string;
+  };
   sold: number;
   role: UserRoles;
+  agency: string | null;
+  properties: string[];
 }
 
 interface AuthContext {
