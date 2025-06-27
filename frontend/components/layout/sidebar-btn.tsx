@@ -1,5 +1,5 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import { ReactNode } from "react";
 import Link from "next/link";
@@ -14,7 +14,11 @@ interface Props {
 }
 
 const SidebarButton = ({ item }: Props) => {
-  const isActive = usePathname() === item.url;
+  const pathname = usePathname();
+  const { agencyId } = useParams();
+  const isActive =
+    item.url === pathname ||
+    (item.url !== `/app/${agencyId}` && pathname.startsWith(item.url));
 
   return (
     <SidebarMenuItem key={item.title}>

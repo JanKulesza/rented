@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,7 +19,7 @@ import {
 import SidebarButton from "./sidebar-btn";
 import SidebarAgencyFooter from "./sidebar-footer";
 
-const AppSidebar = async ({ agencyId }: { agencyId: string }) => {
+const AppSidebar = ({ agencyId }: { agencyId: string }) => {
   const ROOTPATH = `/app/${agencyId}`;
   const items = [
     { title: "Dashboard", url: ROOTPATH, icon: <Home /> },
