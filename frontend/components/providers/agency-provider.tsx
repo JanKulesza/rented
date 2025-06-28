@@ -53,7 +53,7 @@ export type Property =
       listingType: ListingTypes.SALE | ListingTypes.RENT;
     });
 
-interface Agency {
+export interface Agency {
   _id: string;
   name: string;
   location: string;

@@ -4,10 +4,9 @@ import SRPerType from "@/components/app/dashboard/sr-per-type";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import InfoCards from "@/components/app/dashboard/info-cards";
-
-import PropertyCarousel from "@/components/app/dashboard/property-carousel";
 import LatestSales from "@/components/app/dashboard/latest-sales";
 import TopAgents from "@/components/app/dashboard/top-agents";
+import ListingsCarousel from "@/components/app/dashboard/carousel";
 
 const AgencyDashboard = async ({
   params,
@@ -55,7 +54,7 @@ const AgencyDashboard = async ({
         </div>
       </section>
       <section className="border border-sidebar-border rounded-xl p-6">
-        <PropertyCarousel />
+        <ListingsCarousel />
       </section>
     </>
   );

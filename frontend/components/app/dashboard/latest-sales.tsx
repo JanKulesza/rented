@@ -6,6 +6,7 @@ import {
   Property,
 } from "@/components/providers/agency-provider";
 import { sort } from "fast-sort";
+import { formatAddress } from "@/lib/utils";
 
 const LatestSales = () => {
   const { agency } = useContext(agencyContext);
@@ -24,7 +25,7 @@ const LatestSales = () => {
             key={p._id}
             image={p.image?.url ?? ""}
             label={p.name}
-            info={p.location}
+            info={formatAddress(p.address)}
             href={`${agency._id}/sales/${p._id}`}
           />
         ))}

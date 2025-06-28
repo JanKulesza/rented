@@ -2,6 +2,7 @@
 import React from "react";
 import { UserRoles } from "../auth/signup-schema";
 import { SigninSchemaType } from "../auth/signin-schema";
+import { Agency, Property } from "./agency-provider";
 
 export interface User {
   _id: string;
@@ -18,8 +19,10 @@ export interface User {
   };
   sold: number;
   role: UserRoles;
-  agency: string | null;
-  properties: string[];
+  agency: Agency | string | null;
+  properties: string[] | Property[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface AuthContext {

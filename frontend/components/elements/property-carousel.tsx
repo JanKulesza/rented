@@ -1,6 +1,5 @@
 "use client";
 import {
-  agencyContext,
   Property,
   PropertyTypes,
 } from "@/components/providers/agency-provider";
@@ -13,8 +12,8 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import { sort } from "fast-sort";
-import React, { useContext, useState } from "react";
-import PropertyCard from "../listings/property-card";
+import { useState } from "react";
+import PropertyCard from "../app/listings/property-card";
 import {
   Select,
   SelectContent,
@@ -23,10 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const PropertyCarousel = () => {
-  const {
-    agency: { properties },
-  } = useContext(agencyContext);
+const PropertyCarousel = ({ properties }: { properties: Property[] }) => {
   const [filteredProp, setFilteredProp] = useState(properties as Property[]);
   const [propSorting, setPropSorting] = useState<"popular" | "newest">(
     "popular"
@@ -41,8 +37,8 @@ const PropertyCarousel = () => {
   };
   return (
     <>
-      <div className="flex justify-between mb-5 items-center">
-        <h6 className="font-semibold text-xl mb-2">Listings</h6>
+      <div className="flex justify-between mb-10 items-center">
+        <h6 className="font-medium text-lg mb-2">Active listings</h6>
         <div className="flex gap-2">
           <Button
             onClick={() => setPropSorting("popular")}
@@ -72,7 +68,7 @@ const PropertyCarousel = () => {
         </div>
       </div>
 
-      <div className="px-12 mt-5">
+      <div className="px-12">
         <Carousel>
           <CarouselContent>
             {sort(filteredProp)
@@ -80,7 +76,7 @@ const PropertyCarousel = () => {
               .slice(0, 19)
               .map((p) => (
                 <CarouselItem
-                  className="basis-full md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                  className="basis-full md:basis-1/2 lg:basis-1/3"
                   key={p._id}
                 >
                   <PropertyCard property={p} />
