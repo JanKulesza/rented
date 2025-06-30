@@ -1,9 +1,10 @@
+"use client";
 import { Property } from "@/components/providers/agency-provider";
 import { ListingTypes } from "@/entities/listing-types";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { useParams } from "next/navigation";
 
 interface PropertyCardProps {
   property: Property;
@@ -11,9 +12,10 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = ({ property, className }: PropertyCardProps) => {
+  const { agencyId } = useParams();
   return (
     <Link
-      href={`listings/${property._id}`}
+      href={`${agencyId && `/app/${agencyId}/`}listings/${property._id}`}
       className={cn(
         "flex flex-col min-h-96 rounded-xl overflow-hidden hover:bg-sidebar/80 duration-500 transition-all",
         className
