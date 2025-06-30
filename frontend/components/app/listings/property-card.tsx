@@ -1,4 +1,5 @@
-import { ListingTypes, Property } from "@/components/providers/agency-provider";
+import { Property } from "@/components/providers/agency-provider";
+import { ListingTypes } from "@/entities/listing-types";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";

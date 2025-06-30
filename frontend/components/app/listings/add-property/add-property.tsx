@@ -11,10 +11,10 @@ import {
 } from "./add-property-schema";
 import {
   agencyContext,
-  ListingTypes,
   Property,
   PropertyTypes,
 } from "@/components/providers/agency-provider";
+import { ListingTypes } from "@/entities/listing-types";
 import { useContext, useState } from "react";
 import { authContext } from "@/components/providers/auth-provider";
 import { Tabs } from "@/components/ui/tabs";

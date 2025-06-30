@@ -1,5 +1,5 @@
 "use client";
-import CustomAreaChart from "@/components/elements/custom-area-chart";
+import CustomAreaChart from "@/components/elements/charts/custom-area-chart";
 import {
   agencyContext,
   Property,

@@ -1,7 +1,5 @@
-import {
-  ListingTypes,
-  PropertyTypes,
-} from "@/components/providers/agency-provider";
+import { PropertyTypes } from "@/components/providers/agency-provider";
+import { ListingTypes } from "@/entities/listing-types";
 import { Amenity } from "@/entities/amenities";
 import { z } from "zod";
 

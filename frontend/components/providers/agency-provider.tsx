@@ -6,6 +6,7 @@ import {
   LivingAreaType,
 } from "../app/listings/add-property/add-property-schema";
 import { Amenity } from "@/entities/amenities";
+import { ListingTypes } from "@/entities/listing-types";
 
 export enum PropertyTypes {
   APARTMENT = "Apartment",
@@ -17,12 +18,6 @@ export enum PropertyTypes {
   COMMERCIAL = "Commercial",
   INDUSTRIAL = "Industrial",
   WAREHOUSE = "Warehouse",
-}
-
-export enum ListingTypes {
-  SALE = "Sale",
-  RENT = "Rent",
-  PENDING = "Pending",
 }
 
 interface PropertyBase {

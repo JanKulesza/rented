@@ -8,7 +8,7 @@ import React, { useEffect } from "react";
 import { TabEnum } from "./add-property";
 import { useFormContext } from "react-hook-form";
 import { AddPropertySchemaType } from "./add-property-schema";
-import { ListingTypes } from "@/components/providers/agency-provider";
+import { ListingTypes } from "@/entities/listing-types";
 
 const TabPrice = () => {
   const [MIN, MAX] = [1, 1000000000];

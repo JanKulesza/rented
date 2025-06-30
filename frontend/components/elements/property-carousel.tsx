@@ -69,23 +69,31 @@ const PropertyCarousel = ({ properties }: { properties: Property[] }) => {
       </div>
 
       <div className="px-12">
-        <Carousel>
-          <CarouselContent>
-            {sort(filteredProp)
-              .desc((p) => (propSorting === "popular" ? p.rating : p.createdAt))
-              .slice(0, 19)
-              .map((p) => (
-                <CarouselItem
-                  className="basis-full md:basis-1/2 lg:basis-1/3"
-                  key={p._id}
-                >
-                  <PropertyCard property={p} />
-                </CarouselItem>
-              ))}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
+        {filteredProp.length !== 0 ? (
+          <Carousel>
+            <CarouselContent>
+              {sort(filteredProp)
+                .desc((p) =>
+                  propSorting === "popular" ? p.rating : p.createdAt
+                )
+                .slice(0, 19)
+                .map((p) => (
+                  <CarouselItem
+                    className="basis-full md:basis-1/2 lg:basis-1/3"
+                    key={p._id}
+                  >
+                    <PropertyCard property={p} />
+                  </CarouselItem>
+                ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        ) : (
+          <p className="text-muted-foreground w-full py-36 text-center">
+            There are no properties to be shown
+          </p>
+        )}
       </div>
     </>
   );

@@ -1,5 +1,6 @@
-"use client";
-import { ListingTypes, Property } from "@/components/providers/agency-provider";
+import CustomLineChart from "@/components/elements/charts/custom-line-chart";
+import { Property } from "@/components/providers/agency-provider";
+import { ListingTypes } from "@/entities/listing-types";
 import {
   Card,
   CardContent,
@@ -8,12 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartConfig } from "@/components/ui/chart";
 import {
   subMonths,
   isSameMonth,
@@ -23,17 +19,19 @@ import {
   isWithinInterval,
 } from "date-fns";
 import { TrendingUp } from "lucide-react";
-import { CartesianGrid, XAxis, Line, LabelList, LineChart } from "recharts";
 
 const chartConfig = {
   totalListings: {
     label: "Total listings",
+    color: "var(--primary)",
   },
   rent: {
     label: "For rent",
+    color: "#82ca9d",
   },
   sale: {
     label: "For sale",
+    color: "#fe6d8e",
   },
 } satisfies ChartConfig;
 
@@ -52,7 +50,7 @@ const AgentChart = ({ properties }: { properties: Property[] }) => {
 
     const count = inWindow.length;
     const countRent = inWindow.filter(
-      (p) => p.listingType === ListingTypes.RENT
+      (p) => (p.listingType as ListingTypes) === ListingTypes.RENT
     ).length;
     const countSale = inWindow.filter(
       (p) => p.listingType === ListingTypes.SALE
@@ -92,87 +90,11 @@ const AgentChart = ({ properties }: { properties: Property[] }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart
-            accessibilityLayer
-            data={data}
-            margin={{
-              top: 20,
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <Line
-              dataKey="totalListings"
-              type="natural"
-              stroke="var(--primary)"
-              strokeWidth={2}
-              dot={{
-                fill: "var(--primary)",
-              }}
-              activeDot={{
-                r: 6,
-              }}
-            >
-              <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
-              />
-            </Line>
-            <Line
-              dataKey="rent"
-              type="natural"
-              stroke="#82ca9d"
-              strokeWidth={2}
-              dot={{
-                fill: "#82ca9d",
-              }}
-              activeDot={{
-                r: 6,
-              }}
-            >
-              <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
-              />
-            </Line>
-            <Line
-              dataKey="sale"
-              type="natural"
-              stroke="#fe6d8e"
-              strokeWidth={2}
-              dot={{
-                fill: "#fe6d8e",
-              }}
-              activeDot={{
-                r: 6,
-              }}
-            >
-              <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
-              />
-            </Line>
-          </LineChart>
-        </ChartContainer>
+        <CustomLineChart
+          chartConfig={chartConfig}
+          data={data}
+          dataKey="month"
+        />
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-1 leading-none font-medium">

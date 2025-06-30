@@ -1,10 +1,10 @@
 "use client";
-import CustomPieChart from "@/components/elements/custom-pie-chart";
+import CustomPieChart from "@/components/elements/charts/custom-pie-chart";
 import {
   agencyContext,
-  ListingTypes,
   Property,
 } from "@/components/providers/agency-provider";
+import { ListingTypes } from "@/entities/listing-types";
 import { useContext } from "react";
 
 const DataPieCharts = () => {

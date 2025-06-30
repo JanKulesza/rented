@@ -1,5 +1,6 @@
 "use client";
-import { ListingTypes, Property } from "@/components/providers/agency-provider";
+import { Property } from "@/components/providers/agency-provider";
+import { ListingTypes } from "@/entities/listing-types";
 import Image from "next/image";
 import { User } from "@/components/providers/auth-provider";
 import { formatAddress } from "@/lib/utils";

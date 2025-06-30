@@ -1,5 +1,10 @@
-import { ListingTypes } from "@/components/providers/agency-provider";
 import { CalendarSync, HandCoins, SquarePen } from "lucide-react";
+
+export enum ListingTypes {
+  SALE = "Sale",
+  RENT = "Rent",
+  PENDING = "Pending",
+}
 
 export const listingTypesMapping = [
   {

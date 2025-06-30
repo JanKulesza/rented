@@ -9,10 +9,8 @@ import React, { useContext, useEffect } from "react";
 import { TabEnum } from "./add-property";
 import { useFormContext } from "react-hook-form";
 import { AddPropertySchemaType } from "./add-property-schema";
-import {
-  agencyContext,
-  ListingTypes,
-} from "@/components/providers/agency-provider";
+import { agencyContext } from "@/components/providers/agency-provider";
+import { ListingTypes } from "@/entities/listing-types";
 import { User } from "@/components/providers/auth-provider";
 
 const TabAgents = () => {
