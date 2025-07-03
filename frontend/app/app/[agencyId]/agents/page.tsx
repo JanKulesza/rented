@@ -30,8 +30,8 @@ const PageAgents = () => {
       );
   }, [name]);
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-between">
+    <div className="flex flex-col gap-6 max-sm:px-2">
+      <div className="flex max-sm:flex-col w-full gap-2 justify-between">
         <div className="flex shadow-xs rounded-md h-9 overflow-hidden border-input border">
           <Input
             placeholder="Name"
