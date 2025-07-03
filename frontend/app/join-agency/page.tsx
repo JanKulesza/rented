@@ -1,7 +1,7 @@
 import JoinAgency from "@/components/join-agency/join-agency";
 import { Agency } from "@/components/providers/agency-provider";
 import { isPast, toDate } from "date-fns";
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 import { redirect } from "next/navigation";
 
 const JoinAgencyPage = async ({
@@ -11,7 +11,7 @@ const JoinAgencyPage = async ({
 }) => {
   const { token } = await searchParams;
 
-  const decoded = jwtDecode(token);
+  const decoded = jwtDecode<JwtPayload & { agencyId: string }>(token);
 
   const { exp, agencyId } = decoded;
 
