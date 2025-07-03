@@ -17,11 +17,11 @@ const PropertyCard = ({ property, className }: PropertyCardProps) => {
     <Link
       href={`${agencyId && `/app/${agencyId}/`}listings/${property._id}`}
       className={cn(
-        "flex flex-col min-h-96 rounded-xl overflow-hidden hover:bg-sidebar/80 duration-500 transition-all",
+        "flex flex-col rounded-xl overflow-hidden hover:shadow-xl duration-500 max-w-80 transition-all",
         className
       )}
     >
-      <div className="relative w-full h-72 max-w-80">
+      <div className="relative w-full h-72">
         <Image
           src={property.image.url}
           alt={property.propertyType}

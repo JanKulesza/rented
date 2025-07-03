@@ -29,7 +29,7 @@ const AgentDetailsPage = async ({
   return (
     <div className="space-y-6">
       <BackButton>
-        <ChevronLeft /> {agent.firstName + " " + agent.lastName}{" "}
+        <ChevronLeft /> {agent.firstName + " " + agent.lastName}
       </BackButton>
       <section className="flex gap-6">
         <div className="w-1/3 border bg-card rounded-2xl shadow-sm p-6 relative">

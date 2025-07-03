@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Clipboard } from "lucide-react";
+import { Clipboard, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -37,7 +37,9 @@ const AddAgent = () => {
   return (
     <Dialog>
       <DialogTrigger asChild onClick={() => setUrl("")}>
-        <Button>Add Agent</Button>
+        <Button>
+          <Plus /> Add Agent
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

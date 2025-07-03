@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const AgentCard = ({ agent }: { agent: User }) => {
   return (
-    <div className="p-4 h-58 w-full flex max-[450px]:flex-col hover:bg-sidebar hover:shadow-xl transition-all duration-500 rounded-xl">
+    <div className="h-58 w-full flex max-[450px]:flex-col hover:shadow-xl transition-all duration-500 rounded-xl">
       <div className="aspect-square object-cover relative w-1/2 sm:w-1/3 max-w-58">
         <Image
           fill

@@ -18,7 +18,7 @@ import {
   startOfMonth,
   isWithinInterval,
 } from "date-fns";
-import { TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 
 const chartConfig = {
   totalListings: {
@@ -99,8 +99,17 @@ const AgentChart = ({ properties }: { properties: Property[] }) => {
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-1 leading-none font-medium">
           Trending up by
-          <span className="text-primary flex gap-1">
-            <TrendingUp className="h-4 w-4" /> {pctChange.toString()}%
+          <span
+            className={`${
+              +pctChange > 0 ? "text-primary" : "text-destructive"
+            } flex gap-1`}
+          >
+            {+pctChange > 0 ? (
+              <TrendingUp className="h-4 w-4" />
+            ) : (
+              <TrendingDown className="h-4 w-4" />
+            )}{" "}
+            {pctChange.toString()}%
           </span>
           this month
         </div>
