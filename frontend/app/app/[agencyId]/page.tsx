@@ -20,22 +20,22 @@ const AgencyDashboard = async ({
       <section className="grid sm:grid-cols-2 xl:grid-cols-4 w-full justify-center sm:justify-between gap-2 lg:gap-8">
         <DataPieCharts />
       </section>
-      <section className="flex max-lg:flex-col gap-2 lg:gap-8 h-[500px]">
+      <section className="flex max-lg:flex-col gap-2 lg:gap-8 lg:h-[500px]">
         <div className="border border-sidebar-border lg:w-2/3 rounded-xl p-4 sm:p-6 xl:p-8">
-          <h6 className="font-semibold text-xl mb-5">Properties listed</h6>
+          <h6 className="font-medium text-lg mb-2">Properties listed</h6>
           <div className="w-full h-96 overflow-hidden">
             <PropertiesListedChart />
           </div>
         </div>
         <div className=" border border-sidebar-border lg:w-1/3 rounded-xl overflow-y-auto p-4 sm:p-6 xl:p-8">
-          <h6 className="font-semibold text-xl mb-5">S&R Per Property Type</h6>
+          <h6 className="font-medium text-lg mb-2">S&R Per Property Type</h6>
           <SRPerType />
         </div>
       </section>
       <section className="grid lg:grid-cols-3 gap-2 lg:gap-8">
         <div className="border border-sidebar-border rounded-xl p-6">
           <div className="flex justify-between items-center mb-3">
-            <h6 className="font-semibold text-xl mb-2">Top Agents</h6>
+            <h6 className="font-medium text-lg mb-2">Top Agents</h6>
             <Button variant="outline" asChild>
               <Link href={`${agencyId}/agents`}>View all</Link>
             </Button>
@@ -45,7 +45,7 @@ const AgencyDashboard = async ({
         <InfoCards />
         <div className="border border-sidebar-border rounded-xl p-6">
           <div className="flex justify-between items-center mb-3">
-            <h6 className="font-semibold text-xl mb-2">Latest sales</h6>
+            <h6 className="font-medium text-lg mb-2">Latest sales</h6>
             <Button variant="outline" asChild>
               <Link href={`${agencyId}/sales`}>View all</Link>
             </Button>

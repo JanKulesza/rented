@@ -7,8 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { Amenity, AmenityMappings } from "@/entities/amenities";
-import { Separator } from "@radix-ui/react-dropdown-menu";
 import React from "react";
 
 const AmenitiesModal = ({ amenities }: { amenities: Amenity[] }) => {
@@ -17,8 +17,8 @@ const AmenitiesModal = ({ amenities }: { amenities: Amenity[] }) => {
       <DialogTrigger asChild>
         <Button>{`Show all ${amenities.length} amenities`}</Button>
       </DialogTrigger>
-      <DialogContent className="sm:h-8/10 sm:w-4/5 z-50 sm:max-w-2xl p-0 overflow-hidden">
-        <div className="overflow-y-auto p-8 space-y-8">
+      <DialogContent className="sm:max-h-[80vh] sm:w-4/5 z-50 sm:max-w-2xl p-0 overflow-hidden">
+        <div className="overflow-y-auto p-8 space-y-8 max-h-[80vh]">
           <DialogHeader>
             <DialogTitle className="text-xl">
               What this place offers

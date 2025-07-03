@@ -21,7 +21,7 @@ const PropertyCard = ({ property, className }: PropertyCardProps) => {
         className
       )}
     >
-      <div className="relative w-full h-72">
+      <div className="aspect-square relative w-full h-72">
         <Image
           src={property.image.url}
           alt={property.propertyType}

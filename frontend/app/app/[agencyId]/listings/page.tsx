@@ -195,7 +195,7 @@ const ListingsPage = () => {
         />
       </div>
       {filteredProperties.length > 0 ? (
-        <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
+        <div className="flex flex-wrap gap-5 max-lg:justify-center">
           {filteredProperties.map((p) => (
             <PropertyCard key={p._id} property={p} />
           ))}

@@ -20,15 +20,21 @@ const LatestSales = () => {
   return (
     <>
       <div className="flex flex-col gap-6">
-        {latestSales.map((p) => (
-          <MiniCard
-            key={p._id}
-            image={p.image?.url ?? ""}
-            label={p.name}
-            info={formatAddress(p.address)}
-            href={`${agency._id}/sales/${p._id}`}
-          />
-        ))}
+        {latestSales.length > 0 ? (
+          latestSales.map((p) => (
+            <MiniCard
+              key={p._id}
+              image={p.image?.url ?? ""}
+              label={p.name}
+              info={formatAddress(p.address)}
+              href={`${agency._id}/sales/${p._id}`}
+            />
+          ))
+        ) : (
+          <p className="text-muted-foreground text-center p-6">
+            No latest sales
+          </p>
+        )}
       </div>
     </>
   );
