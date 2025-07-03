@@ -12,11 +12,11 @@ import {
 import { ChartConfig } from "@/components/ui/chart";
 import {
   subMonths,
-  isSameMonth,
   format,
   endOfMonth,
   startOfMonth,
   isWithinInterval,
+  isBefore,
 } from "date-fns";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
@@ -44,16 +44,18 @@ const AgentChart = ({ properties }: { properties: Property[] }) => {
   );
 
   const data = windowDates.map((dt) => {
-    const inWindow = properties.filter((p) =>
-      isSameMonth(new Date((p as Property).createdAt), dt)
-    );
-
-    const count = inWindow.length;
-    const countRent = inWindow.filter(
-      (p) => (p.listingType as ListingTypes) === ListingTypes.RENT
+    const count = properties.filter((p) =>
+      isBefore(p.createdAt, endOfMonth(dt))
     ).length;
-    const countSale = inWindow.filter(
-      (p) => p.listingType === ListingTypes.SALE
+    const countRent = properties.filter(
+      (p) =>
+        (p.listingType as ListingTypes) === ListingTypes.RENT &&
+        isBefore(p.createdAt, endOfMonth(dt))
+    ).length;
+    const countSale = properties.filter(
+      (p) =>
+        p.listingType === ListingTypes.SALE &&
+        isBefore(p.createdAt, endOfMonth(dt))
     ).length;
 
     return {
@@ -82,14 +84,14 @@ const AgentChart = ({ properties }: { properties: Property[] }) => {
   ).toFixed();
 
   return (
-    <Card className="w-2/3">
+    <Card className="w-full sm:w-1/2 lg:w-2/3">
       <CardHeader>
         <CardTitle>Agent&apos;s listings</CardTitle>
         <CardDescription>
           {format(subMonths(now, 5), "MMMM")} - {format(now, "MMMM yyyy")}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="h-full">
         <CustomLineChart
           chartConfig={chartConfig}
           data={data}
@@ -98,7 +100,7 @@ const AgentChart = ({ properties }: { properties: Property[] }) => {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-1 leading-none font-medium">
-          Trending up by
+          Trending
           <span
             className={`${
               +pctChange > 0 ? "text-primary" : "text-destructive"
@@ -108,7 +110,7 @@ const AgentChart = ({ properties }: { properties: Property[] }) => {
               <TrendingUp className="h-4 w-4" />
             ) : (
               <TrendingDown className="h-4 w-4" />
-            )}{" "}
+            )}
             {pctChange.toString()}%
           </span>
           this month

@@ -37,9 +37,9 @@ const PropertyCarousel = ({ properties }: { properties: Property[] }) => {
   };
   return (
     <>
-      <div className="flex justify-between mb-10 items-center">
+      <div className="flex max-sm:flex-col w-full justify-between mb-10 items-center">
         <h6 className="font-medium text-lg mb-2">Active listings</h6>
-        <div className="flex gap-2">
+        <div className="flex max-sm:flex-col gap-2 max-sm:w-full">
           <Button
             onClick={() => setPropSorting("popular")}
             variant={propSorting === "popular" ? "default" : "secondary"}

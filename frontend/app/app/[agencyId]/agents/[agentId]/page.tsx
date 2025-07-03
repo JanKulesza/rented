@@ -7,7 +7,8 @@ import { notFound, redirect } from "next/navigation";
 import AgentChart from "@/components/app/agents/details/agent-chart";
 import PropertyCarousel from "@/components/elements/property-carousel";
 import BackButton from "@/components/elements/back-btn";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Dot } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 const AgentDetailsPage = async ({
   params,
@@ -26,16 +27,20 @@ const AgentDetailsPage = async ({
 
   const agent = (await res.json()) as User;
 
+  const properties = agent.properties as Property[];
+  const countSold = properties.filter((p) => p.isSold).length;
+
+  const soldDiff = countSold > 0 ? (properties.length / countSold) * 100 : 0;
+
   return (
     <div className="space-y-6">
       <BackButton>
         <ChevronLeft /> {agent.firstName + " " + agent.lastName}
       </BackButton>
-      <section className="flex gap-6">
-        <div className="w-1/3 border bg-card rounded-2xl shadow-sm p-6 relative">
-          <div className="w-full left-0 top-0 bg-primary h-36 rounded-2xl absolute" />
-          <div className="flex gap-2 items-end mt-18 mb-3">
-            <div className="h-28 w-28 relative">
+      <section className="flex max-sm:flex-col gap-6">
+        <div className="w-full sm:w-1/2 lg:w-1/3 border bg-card rounded-2xl shadow-sm flex flex-col justify-between p-6 pt-12 gap-4">
+          <div className="flex gap-2 items-center mb-3">
+            <div className="aspect-square w-1/2 relative max-h-24 max-w-24 ">
               <Image
                 fill
                 className="rounded-full"
@@ -43,12 +48,12 @@ const AgentDetailsPage = async ({
                 alt={agent.firstName + " " + agent.lastName}
               />
             </div>
-            <p>
+            <div className="w-1/2">
               <h3 className="text-lg">
                 {agent.firstName + " " + agent.lastName}
               </h3>
               <span className="text-muted-foreground">{agent.role}</span>
-            </p>
+            </div>
           </div>
           <table className="w-full border-separate border-spacing-3 text-sm">
             {agent.agency &&
@@ -88,6 +93,22 @@ const AgentDetailsPage = async ({
               <td>{agent.phone}</td>
             </tr>
           </table>
+          <div>
+            <div className="flex items-center justify-between text-sm mb-0">
+              <span className="flex items-center">
+                Sold <Dot />
+                <span className="text-muted-foreground">
+                  {agent.properties.length} listed
+                </span>
+              </span>
+              <span>{soldDiff.toFixed()}%</span>
+            </div>
+            <Progress
+              value={soldDiff}
+              className="bg-accent"
+              color="var(--primary)"
+            />
+          </div>
         </div>
         <AgentChart properties={agent.properties as Property[]} />
       </section>

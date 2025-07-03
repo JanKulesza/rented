@@ -19,12 +19,13 @@ const CustomLineChart = ({
   chartConfig,
 }: CustomLineChartProps) => {
   return (
-    <ChartContainer config={chartConfig}>
+    <ChartContainer config={chartConfig} className="h-full w-full">
       <LineChart
         accessibilityLayer
         data={data}
         margin={{
-          top: 20,
+          top: 30,
+          bottom: 10,
           left: 12,
           right: 12,
         }}

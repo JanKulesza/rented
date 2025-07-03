@@ -6,14 +6,14 @@ import {
 } from "@/components/providers/agency-provider";
 import { Progress } from "@/components/ui/progress";
 import { Dot } from "lucide-react";
-import { useContext } from "react";
+import { Fragment, useContext } from "react";
 
 const SRPerType = () => {
   const {
     agency: { properties },
   } = useContext(agencyContext);
   const TYPE_COLORS: Record<PropertyTypes, string> = {
-    [PropertyTypes.APARTAMENT]: "#6366F1", // indigo-500
+    [PropertyTypes.APARTMENT]: "#6366F1", // indigo-500
     [PropertyTypes.STUDIO]: "#34D399", // emerald-400
     [PropertyTypes.HOUSE]: "#F472B6", // pink-400
     [PropertyTypes.VILLA]: "#38BDF8", // sky-400
@@ -21,6 +21,7 @@ const SRPerType = () => {
     [PropertyTypes.TOWNHOUSE]: "#FBBF24", // amber-400
     [PropertyTypes.COMMERCIAL]: "#FB923C", // orange-400
     [PropertyTypes.INDUSTRIAL]: "#F87171", // red-400
+    [PropertyTypes.WAREHOUSE]: "blue-400",
   };
   return (
     <div className="flex flex-col justify-between gap-4">
@@ -32,7 +33,7 @@ const SRPerType = () => {
         const pDiff = p.length === 0 ? 0 : (ps.length / p.length) * 100;
         const color = TYPE_COLORS[pt];
         return (
-          <div key={pt}>
+          <Fragment key={pt}>
             <div className="flex items-center justify-between text-sm mb-0">
               <span className="flex items-center">
                 {pt} <Dot />
@@ -41,7 +42,7 @@ const SRPerType = () => {
               <span>{pDiff.toFixed()}%</span>
             </div>
             <Progress value={pDiff} className="bg-accent" color={color} />
-          </div>
+          </Fragment>
         );
       })}
     </div>
