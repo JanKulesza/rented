@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import FormInput from "../inputs/form-input";
 import Link from "next/link";
 import google from "@/public/google.svg";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signinSchema, SigninSchemaType } from "./signin-schema";
 import { Form } from "../ui/form";
@@ -19,6 +19,8 @@ const SignInForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [googleCallback, setGoogleCallback] = useState<string | null>(null);
   const { signin } = useContext(authContext);
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirectUrl");
   const form = useForm<SigninSchemaType>({
     resolver: zodResolver(signinSchema),
     defaultValues: {
@@ -33,7 +35,7 @@ const SignInForm = () => {
       const res = await signin(values);
 
       if (res.ok) {
-        router.push("/");
+        router.push(redirectUrl ?? "/");
       } else if ([400, 401].includes(res.status)) {
         form.setError("email", { message: "Invalid credentials." });
         form.setError("password", { message: "Invalid credentials." });
@@ -53,7 +55,7 @@ const SignInForm = () => {
   useEffect(() => {
     (async () => {
       const res = await fetch(
-        "http://localhost:8080/api/auth/google/callback",
+        `http://localhost:8080/api/auth/google/callback?redirectUrl=${redirectUrl}`,
         {
           credentials: "include",
         }

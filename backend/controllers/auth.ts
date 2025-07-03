@@ -96,9 +96,13 @@ export const refreshToken = async (
   res.status(200).json(newAccessToken);
 };
 
+// GOOGLE OAUTH
+
 const REDIRECTURI = "http://localhost:8080/api/auth/google/oauth";
 
 export const getGoogleOAuthURL = async (req: Request, res: Response) => {
+  const { redirectUrl } = req.query as { redirectUrl?: string };
+  const state = encodeURIComponent(redirectUrl || "http://localhost:3000/");
   res.setHeader("Referrer-Policy", "no-refferer-when-downgrade");
   const oAuth2Client = new OAuth2Client({
     clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -114,6 +118,7 @@ export const getGoogleOAuthURL = async (req: Request, res: Response) => {
       "https://www.googleapis.com/auth/userinfo.profile",
     ],
     prompt: "consent",
+    state,
   });
 
   res.status(200).json({ url: authorizeUrl });
@@ -124,6 +129,10 @@ export const googleOAuth = async (req: Request, res: Response) => {
     "code" in req.query && typeof req.query.code == "string"
       ? req.query.code
       : null;
+  const state =
+    typeof req.query.state === "string"
+      ? decodeURIComponent(req.query.state)
+      : "/";
 
   if (!code) {
     res.status(500).json({ error: "Missing code." });
@@ -160,8 +169,7 @@ export const googleOAuth = async (req: Request, res: Response) => {
 
   if (user) {
     res.cookie("refreshToken", user.generateRefreshToken());
-
-    res.redirect("http://localhost:3000");
+    res.redirect(state);
     return;
   }
 
@@ -185,8 +193,11 @@ export const googleOAuth = async (req: Request, res: Response) => {
   });
 
   res.cookie("googleOAuthJWT", serialized);
-
-  res.redirect("http://localhost:3000/signup/google");
+  res.redirect(
+    `http://localhost:3000/signup/google?redirectUrl=${encodeURIComponent(
+      state
+    )}`
+  );
 };
 
 export const createGoogleOAuthUser = async (req: Request, res: Response) => {
@@ -225,6 +236,11 @@ export const createGoogleOAuthUser = async (req: Request, res: Response) => {
     return;
   }
 
+  if (await User.findOne({ email: googleOAuthPayload.email })) {
+    res.status(400).json({ error: "User already exists." });
+    return;
+  }
+
   const { address, phone, role } = data;
 
   delete googleOAuthPayload.iat;
@@ -239,7 +255,7 @@ export const createGoogleOAuthUser = async (req: Request, res: Response) => {
 
   res.cookie("refreshToken", user.generateRefreshToken());
 
-  const accessToken = user.generateAccessToken;
+  const accessToken = user.generateAccessToken();
 
   res.status(200).json({ token: accessToken });
 };

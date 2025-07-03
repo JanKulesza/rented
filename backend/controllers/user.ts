@@ -52,6 +52,7 @@ export const createUser = async (req: Request, res: Response) => {
     address,
     role,
   });
+
   const savedUser = await user.save();
 
   res.status(201).json(savedUser);

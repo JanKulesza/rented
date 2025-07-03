@@ -5,9 +5,14 @@ import {
   agencySchema,
   type AgencySchemaType,
 } from "../utils/schemas/agency.ts";
-import { userSchema, type UserSchemaType } from "../utils/schemas/user.ts";
+import {
+  UserRoles,
+  userSchema,
+  type UserSchemaType,
+} from "../utils/schemas/user.ts";
 import User from "../models/user.ts";
 import Property from "../models/property.ts";
+import jwt from "jsonwebtoken";
 
 export const getAgencies = async (req: Request, res: Response) => {
   const { populate } = req.query;
@@ -199,5 +204,84 @@ export const deleteAgency = async (
     next(error);
   } finally {
     session.endSession();
+  }
+};
+
+export const generateAddUserToken = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const agency = await Agency.findById(id);
+  if (!agency) {
+    res.status(404).json({ error: "Agency not found." });
+  }
+
+  const token = jwt.sign({ agencyId: id }, process.env.JWT_SECRET!, {
+    expiresIn: 60 * 15,
+  });
+
+  res.json({ token });
+};
+
+export const joinAgency = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { token, userId } = req.body;
+  if (!token || typeof token !== "string") {
+    res.status(400).json({ error: "Token is required." });
+    return;
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404).json({ error: "User not found." });
+    return;
+  }
+
+  let payload;
+  try {
+    payload = jwt.verify(token, process.env.JWT_SECRET!) as {
+      agencyId: string;
+    } & jwt.JwtPayload;
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      res.status(401).json({ error: "Invitation expired." });
+      return;
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      res.status(401).json({ error: "Invalid token." });
+      return;
+    }
+    return next(error);
+  }
+
+  const agency = await Agency.findById(payload.agencyId);
+
+  if (!agency) {
+    res.status(400).json({ error: "Invalid agency id." });
+    return;
+  }
+
+  if (user.agency?.toString() === agency._id.toString()) {
+    res
+      .status(400)
+      .json({ error: `User is already an agent of ${agency.name}` });
+    return;
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    await agency.updateOne({ $push: { agents: user._id } }, { session });
+    await user.updateOne(
+      { agency: agency._id, role: UserRoles.AGENT },
+      { session }
+    );
+    await session.commitTransaction();
+    res.status(200).json({});
+  } catch (error) {
+    await session.abortTransaction();
+    next(error);
   }
 };

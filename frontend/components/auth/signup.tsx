@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import google from "@/public/google.svg";
 import { Button } from "../ui/button";
@@ -22,10 +22,12 @@ enum SignUpTabs {
 
 const SignUpForm = () => {
   const router = useRouter();
+  const { signin } = useContext(authContext);
   const [isLoading, setIsLoading] = useState(false);
   const [tab, setTab] = useState<SignUpTabs>(SignUpTabs.Credentials);
   const [googleCallback, setGoogleCallback] = useState<string | null>(null);
-  const { signin } = useContext(authContext);
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirectUrl");
 
   const form = useForm<SignupSchemaType>({
     resolver: zodResolver(signupSchema),
@@ -97,7 +99,7 @@ const SignUpForm = () => {
   useEffect(() => {
     (async () => {
       const res = await fetch(
-        "http://localhost:8080/api/auth/google/callback",
+        `http://localhost:8080/api/auth/google/callback?redirectUrl=${redirectUrl}`,
         {
           credentials: "include",
         }

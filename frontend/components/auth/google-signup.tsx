@@ -8,12 +8,14 @@ import Spinner from "../ui/spinner";
 import { Form } from "../ui/form";
 import FormInput from "../inputs/form-input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authContext } from "../providers/auth-provider";
 
 const GoogleOAuthSignUpForm = () => {
   const { setAuth } = useContext(authContext);
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirectUrl");
   const router = useRouter();
 
   const form = useForm<GoogleSignupSchema>({
@@ -46,7 +48,7 @@ const GoogleOAuthSignUpForm = () => {
       });
 
       if (res.ok) {
-        router.push("/");
+        router.push(redirectUrl ?? "/");
         setAuth((await res.json()).token);
         toast.success("Your account was created successfully!");
       } else {

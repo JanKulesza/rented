@@ -9,7 +9,12 @@ import {
 import Link from "next/link";
 import SignUpForm from "@/components/auth/signup";
 
-const Signin = () => {
+const Signin = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirectUrl: string }>;
+}) => {
+  const { redirectUrl } = await searchParams;
   return (
     <div className="flex p-8 justify-center w-full overflow-auto">
       <Card className="h-fit max-lg:w-full xl:w-1/2 gap-6 flex flex-col shadow-none border-none justify-center items-center">
@@ -25,7 +30,10 @@ const Signin = () => {
         <CardFooter className="text-center">
           <p>
             Already have an account?{" "}
-            <Link className="text-primary" href="/signin">
+            <Link
+              className="text-primary"
+              href={`/signin${redirectUrl && `?redirectUrl=${redirectUrl}`}`}
+            >
               Sign in
             </Link>
           </p>

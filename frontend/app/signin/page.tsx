@@ -11,7 +11,12 @@ import Link from "next/link";
 import skyscraper from "@/public/skyscraper.jpeg";
 import SignInForm from "@/components/auth/signin";
 
-const Signin = () => {
+const Signin = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirectUrl: string }>;
+}) => {
+  const { redirectUrl } = await searchParams;
   return (
     <div className="flex h-[90vh]">
       <Card className="h-full w-full lg:w-2/5 gap-6 rounded-none flex flex-col justify-center items-center">
@@ -24,8 +29,11 @@ const Signin = () => {
         </CardContent>
         <CardFooter className="justify-center">
           <p>
-            Don&apos;t have an account?{" "}
-            <Link className="text-primary" href="/signup">
+            Don&apos;t have an account?
+            <Link
+              className="text-primary"
+              href={`/signup${redirectUrl && `?redirectUrl=${redirectUrl}`}`}
+            >
               Sign up
             </Link>
           </p>

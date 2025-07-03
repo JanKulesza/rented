@@ -1,4 +1,5 @@
 "use client";
+import AddAgent from "@/components/app/agents/add-agent";
 import AgentCard from "@/components/app/agents/agent-card";
 import { agencyContext } from "@/components/providers/agency-provider";
 import { authContext, User } from "@/components/providers/auth-provider";
@@ -14,6 +15,7 @@ const PageAgents = () => {
   const agents = agency.agents as User[];
   return (
     <div className="space-y-5">
+      <AddAgent />
       {agents.map((a) => (
         <Link
           key={a._id}
