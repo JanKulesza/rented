@@ -1,11 +1,18 @@
 "use client";
-import CustomAreaChart from "@/components/elements/charts/custom-area-chart";
+import CustomLineChart from "@/components/elements/charts/custom-line-chart";
 import {
   agencyContext,
   Property,
 } from "@/components/providers/agency-provider";
 import { format, isSameMonth, subMonths } from "date-fns";
 import { useContext } from "react";
+
+const chartConfig = {
+  listings: {
+    label: "Listings",
+    color: "var(--primary)",
+  },
+};
 
 const PropertiesListedChart = () => {
   const {
@@ -25,12 +32,14 @@ const PropertiesListedChart = () => {
     ).length;
 
     return {
-      name: format(dt, "MMM"),
-      value: count,
+      month: format(dt, "MMM"),
+      listings: count,
     };
   });
 
-  return <CustomAreaChart data={data} />;
+  return (
+    <CustomLineChart data={data} chartConfig={chartConfig} dataKey="month" />
+  );
 };
 
 export default PropertiesListedChart;
