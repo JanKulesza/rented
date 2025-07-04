@@ -1,25 +1,38 @@
 import AppSidebar from "@/components/layout/sidebar";
-import AgencyProvider from "@/components/providers/agency-provider";
+import AgencyProvider, { Agency } from "@/components/providers/agency-provider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { notFound, redirect } from "next/navigation";
+import { decodeJwt } from "jose";
+import { User } from "@/components/providers/auth-provider";
 
 export default async function Layout({
   params,
   children,
 }: Readonly<{
-  params: { agencyId: string };
+  params: Promise<{ agencyId: string }>;
   children: React.ReactNode;
 }>) {
   const { agencyId } = await params;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("refreshToken")?.value;
+  if (!token) {
+    return redirect(`/signin?redirectUrl=/app/${agencyId}`);
+  }
+
+  const payload = decodeJwt(token);
+
+  const userId = payload._id as string;
 
   const res = await fetch(`http://localhost:8080/api/agencies/${agencyId}`, {
     cache: "default",
   });
   if (!res.ok) return notFound();
 
-  const agency = await res.json();
+  const agency = (await res.json()) as Agency;
 
-  if (!("_id" in agency)) return notFound();
+  if (!(agency.agents as User[]).map((a) => a._id).includes(userId))
+    return notFound();
 
   return (
     <AgencyProvider agency={agency}>

@@ -78,9 +78,10 @@ userSchema.methods.generateRefreshToken = function () {
   );
 
   return serialize("refreshToken", refreshToken, {
+    domain: "localhost",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "none",
     maxAge: 60 * 60 * 24 * 30,
     path: "/",
   });
