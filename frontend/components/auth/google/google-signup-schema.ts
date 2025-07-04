@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { phoneRegex, UserRoles } from "./signup-schema";
+import { phoneRegex, UserRoles } from "../signup-schema";
 
 export const googleSignupSchema = z.object({
   phone: z

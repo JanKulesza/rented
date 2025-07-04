@@ -32,7 +32,9 @@ const Signin = async ({
             Already have an account?{" "}
             <Link
               className="text-primary"
-              href={`/signin${redirectUrl && `?redirectUrl=${redirectUrl}`}`}
+              href={`/signin${
+                redirectUrl ? `?redirectUrl=${redirectUrl}` : ""
+              }`}
             >
               Sign in
             </Link>

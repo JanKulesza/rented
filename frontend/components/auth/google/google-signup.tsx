@@ -3,13 +3,13 @@ import { useContext, useState } from "react";
 import { googleSignupSchema, GoogleSignupSchema } from "./google-signup-schema";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
-import Spinner from "../ui/spinner";
-import { Form } from "../ui/form";
-import FormInput from "../inputs/form-input";
+import { Button } from "../../ui/button";
+import Spinner from "../../ui/spinner";
+import { Form } from "../../ui/form";
+import FormInput from "../../inputs/form-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
-import { authContext } from "../providers/auth-provider";
+import { authContext } from "../../providers/auth-provider";
 
 const GoogleOAuthSignUpForm = () => {
   const { setAuth } = useContext(authContext);
@@ -36,16 +36,19 @@ const GoogleOAuthSignUpForm = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/google/signup", {
-        method: "POST",
-        body: JSON.stringify({
-          phone,
-          address,
-          role: role ?? "user",
-        }),
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
+      const res = await fetch(
+        "http://localhost:8080/api/auth/google/signup?type=user",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            phone,
+            address,
+            role: role ?? "user",
+          }),
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
 
       if (res.ok) {
         router.push(redirectUrl ?? "/");

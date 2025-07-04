@@ -2,12 +2,11 @@ import { z } from "zod";
 import User from "../../models/user.ts";
 import mongoose from "mongoose";
 import Property from "../../models/property.ts";
+import { addressSchema } from "./address.ts";
 
 export const agencySchema = z.object({
   name: z.string({ required_error: "Name is required." }),
-  location: z
-    .string({ required_error: "Location is required." })
-    .min(3, "Provide correct location."),
+  address: addressSchema,
   owner: z
     .string({ required_error: "Owner is required." })
     .refine(async (arg) => {

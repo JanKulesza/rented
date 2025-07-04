@@ -29,10 +29,12 @@ const Signin = async ({
         </CardContent>
         <CardFooter className="justify-center">
           <p>
-            Don&apos;t have an account?
+            Don&apos;t have an account?{" "}
             <Link
               className="text-primary"
-              href={`/signup${redirectUrl && `?redirectUrl=${redirectUrl}`}`}
+              href={`/signup${
+                redirectUrl ? `?redirectUrl=${redirectUrl}` : ""
+              }`}
             >
               Sign up
             </Link>

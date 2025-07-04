@@ -6,25 +6,23 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import rent from "@/public/skyscraper.jpeg";
-import CreateAgencyForm from "@/components/forms/create-agency";
+import CreateAgencyForm from "@/components/auth/create-agency";
 
 const CreateAgency = () => {
   return (
-    <div className="flex h-[90vh] min-h-fit">
-      <Card className="h-full w-full lg:w-2/5 gap-6 rounded-none flex flex-col pt-[7%] items-center">
+    <div className="flex p-8 justify-center w-full overflow-auto">
+      <Card className="h-fit max-lg:w-full xl:w-1/2 gap-6 flex flex-col shadow-none border-none justify-center items-center">
         <CardHeader className="text-center w-full">
           <CardTitle className="text-2xl">
-            Welcome to <span className="text-primary">Rentify</span>
+            Welcome to <span className="text-primary">Rented</span>
           </CardTitle>
           <CardDescription>
             Where your real estate dream come true.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="w-full sm:px-16">
           <CreateAgencyForm />
         </CardContent>
         <CardFooter className="justify-center">
@@ -36,11 +34,6 @@ const CreateAgency = () => {
           </p>
         </CardFooter>
       </Card>
-      <Image
-        className="h-full lg:w-3/5 hidden lg:block object-cover"
-        src={rent}
-        alt="Rent"
-      />
     </div>
   );
 };

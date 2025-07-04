@@ -65,13 +65,13 @@ const ProfileDropdown = ({ user }: { user: User }) => {
             <span>View Profile</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild disabled>
           <Link href="/me/whishlist" className="space-x-1">
             <Heart style={{ height: 18, width: 18 }} />
             <span>Whishlist</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild disabled>
           <Link
             href="/me/rented"
             className="space-x-1 text-primary focus:text-primary font-bold"
@@ -81,26 +81,32 @@ const ProfileDropdown = ({ user }: { user: User }) => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="space-x-1">
+        <DropdownMenuItem className="space-x-1" disabled>
           <Globe style={{ height: 18, width: 18 }} />
           <span>Language & Currency</span>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild disabled>
           <Link href="/help" className="space-x-1">
             <CircleHelp style={{ height: 18, width: 18 }} />
             <span>Help Center</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link
-            href="/start-renting"
-            className="flex-col items-start leading-5"
-          >
-            <span className="font-bold">Become host</span>
-            <span>It&apos;s easy to start hosting and earn extra income</span>
-          </Link>
-        </DropdownMenuItem>
+        {!user.agency && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link
+                href="/start-renting"
+                className="flex-col items-start leading-5"
+              >
+                <span className="font-bold">Become host</span>
+                <span>
+                  It&apos;s easy to start hosting and earn extra income
+                </span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={signout}

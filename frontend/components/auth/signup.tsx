@@ -1,9 +1,6 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useContext, useEffect, useState } from "react";
-import google from "@/public/google.svg";
+import React, { useContext, useState } from "react";
 import { Button } from "../ui/button";
 import FormInput from "../inputs/form-input";
 import { Form } from "../ui/form";
@@ -14,6 +11,7 @@ import Spinner from "../ui/spinner";
 import { authContext } from "../providers/auth-provider";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import GoogleOauthBtn from "./google-oauth-btn";
 
 enum SignUpTabs {
   Credentials = "credentials",
@@ -21,11 +19,10 @@ enum SignUpTabs {
 }
 
 const SignUpForm = () => {
-  const router = useRouter();
   const { signin } = useContext(authContext);
   const [isLoading, setIsLoading] = useState(false);
   const [tab, setTab] = useState<SignUpTabs>(SignUpTabs.Credentials);
-  const [googleCallback, setGoogleCallback] = useState<string | null>(null);
+  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirectUrl");
 
@@ -76,7 +73,7 @@ const SignUpForm = () => {
           );
         }
 
-        router.push("/");
+        router.push(redirectUrl ?? "/");
         toast.success(
           `${firstName} ${lastName}, your account was created successfully!`
         );
@@ -96,23 +93,11 @@ const SignUpForm = () => {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      const res = await fetch(
-        `http://localhost:8080/api/auth/google/callback?redirectUrl=${redirectUrl}`,
-        {
-          credentials: "include",
-        }
-      );
-      if (res.status === 200) setGoogleCallback((await res.json()).url);
-    })();
-  }, []);
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Tabs value={tab} className="space-y-8">
-          <TabsList className="w-full">
+          <TabsList className="w-full p-0">
             <TabsTrigger
               value={SignUpTabs.Credentials}
               onClick={() => setTab(SignUpTabs.Credentials)}
@@ -159,18 +144,7 @@ const SignUpForm = () => {
             >
               Next
             </Button>
-            {googleCallback && (
-              <Button
-                variant="ghost"
-                className="border-thin border border-zinc-300"
-                asChild
-              >
-                <Link href={googleCallback}>
-                  <Image src={google} alt="" className="w-8 h-8" />
-                  Sign Up with Google
-                </Link>
-              </Button>
-            )}
+            <GoogleOauthBtn to="/signup/google" />
           </TabsContent>
           <TabsContent value="details" className="flex flex-col gap-3">
             <FormInput
@@ -213,8 +187,10 @@ const SignUpForm = () => {
               label="Country"
               placeholder="Poland"
             />
+            <Button variant="default" type="submit" className="mt-8">
+              {isLoading ? <Spinner /> : "Sign Up"}
+            </Button>
             <Button
-              className="mt-8"
               onClick={(e) => {
                 e.preventDefault();
                 setTab(SignUpTabs.Credentials);
@@ -222,9 +198,6 @@ const SignUpForm = () => {
               variant="secondary"
             >
               Previous
-            </Button>
-            <Button variant="default" type="submit">
-              {isLoading ? <Spinner /> : "Sign Up"}
             </Button>
           </TabsContent>
         </Tabs>

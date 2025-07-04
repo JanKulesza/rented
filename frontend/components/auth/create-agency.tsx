@@ -11,10 +11,19 @@ import FormInput from "../inputs/form-input";
 import { useRouter } from "next/navigation";
 import { authContext } from "../providers/auth-provider";
 import { toast } from "sonner";
+import GoogleOauthBtn from "./google-oauth-btn";
+import { Separator } from "../ui/separator";
+
+enum CreateAgencyTabs {
+  Credentials = "credentials",
+  Agency = "agency",
+}
 
 const CreateAgencyForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [tab, setTab] = useState<"owner" | "agency">("owner");
+  const [tab, setTab] = useState<CreateAgencyTabs>(
+    CreateAgencyTabs.Credentials
+  );
   const { signin } = useContext(authContext);
   const router = useRouter();
 
@@ -40,8 +49,10 @@ const CreateAgencyForm = () => {
         const { email, password } = values;
         const authRes = await signin({ email, password });
 
-        if (authRes.ok) router.push(`/app/${data._id}`);
-        else {
+        if (authRes.ok) {
+          router.push(`/app/${data._id}`);
+          toast.success(`Your agency ${data.name}, was created successfully!`);
+        } else {
           router.push("/signin");
           toast.error(
             "Failed to sign in. Please try signing in manually using credentials."
@@ -64,90 +75,124 @@ const CreateAgencyForm = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Tabs className="space-y-8 w-full" value={tab}>
-          <TabsList className="w-full  p-0">
+          <TabsList className="w-full p-0">
             <TabsTrigger
-              value="owner"
+              value={CreateAgencyTabs.Credentials}
               onClick={() => {
-                setTab("owner");
+                setTab(CreateAgencyTabs.Credentials);
               }}
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              Owner details
+              Credentials
             </TabsTrigger>
             <TabsTrigger
-              value="agency"
+              value={CreateAgencyTabs.Agency}
               onClick={() => {
-                setTab("agency");
+                setTab(CreateAgencyTabs.Agency);
               }}
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              Agency details
+              Agency
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="owner" className="flex flex-col gap-3">
+          <TabsContent
+            value={CreateAgencyTabs.Credentials}
+            className="flex flex-col gap-3"
+          >
             <FormInput
               name="firstName"
-              size={50}
               label="First Name"
               placeholder="Enter your first name"
             />
 
             <FormInput
               name="lastName"
-              size={50}
               label="Last Name"
               placeholder="Enter your last name"
             />
-
             <FormInput
               name="email"
-              size={50}
               type="email"
               label="Email"
               placeholder="Enter your email"
             />
-            <div className="flex gap-3 justify-between">
+            <div className="flex max-sm:flex-col gap-3 justify-between items-baseline mb-8">
               <FormInput
                 name="password"
                 label="Password"
                 type="password"
                 placeholder="Enter your Password"
+                className="sm:w-1/2"
               />
               <FormInput
                 name="confirmPassword"
                 label="Confirm Password"
                 type="password"
                 placeholder="Confirm Password"
+                className="sm:w-1/2"
               />
             </div>
             <Button
-              variant="default"
-              className="mt-4 cursor-pointer"
-              onClick={() => setTab("agency")}
+              onClick={(e) => {
+                e.preventDefault();
+                setTab(CreateAgencyTabs.Agency);
+              }}
             >
               Next
             </Button>
+            <GoogleOauthBtn to="/start-renting/google" />
           </TabsContent>
-          <TabsContent value="agency" className="flex flex-col gap-3">
+          <TabsContent
+            value={CreateAgencyTabs.Agency}
+            className="flex flex-col gap-3"
+          >
             <FormInput
               name="name"
-              size={50}
               label="Agency Name"
               placeholder="Enter agency name"
+              className="mb-2"
             />
-
+            <Separator />
+            <p className="text-sm text-muted-foreground my-2 px-1">
+              This address will be used for both the owner and the agency.
+            </p>
+            <div className="flex max-md:flex-col gap-3 items-baseline md:justify-between">
+              <FormInput
+                name="address.city"
+                label="City"
+                placeholder="Warsaw"
+                className="md:w-2/3"
+              />
+              <FormInput
+                name="address.zip"
+                label="Zip code"
+                placeholder="00-001"
+                className="md:w-1/3"
+              />
+            </div>
             <FormInput
-              name="location"
-              size={50}
-              label="Location"
-              placeholder="Enter agency location"
+              name="address.state"
+              label="State"
+              placeholder="Mazowieckie"
             />
-
+            <FormInput
+              name="address.country"
+              label="Country"
+              placeholder="Poland"
+            />
+            <Separator className="my-2" />
+            <FormInput
+              name="phone"
+              label="Phone number"
+              placeholder="+48 123 456 789"
+              description="This is the user's personal phone number"
+              className="mb-8"
+            />
             <div className="flex flex-col ">
               <Button
                 variant="default"
                 type="submit"
-                className="mt-4 cursor-pointer"
+                className="cursor-pointer"
               >
                 {isLoading ? <Spinner /> : "Sign Up"}
               </Button>
@@ -155,7 +200,7 @@ const CreateAgencyForm = () => {
                 variant="secondary"
                 className="mt-4 cursor-pointer"
                 onClick={() => {
-                  setTab("owner");
+                  setTab(CreateAgencyTabs.Credentials);
                 }}
               >
                 Previous

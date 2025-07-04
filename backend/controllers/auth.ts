@@ -5,7 +5,10 @@ import User, { OAuthProviders } from "../models/user.ts";
 import { parse, serialize } from "cookie";
 import { isPast, addDays, fromUnixTime } from "date-fns";
 import { OAuth2Client } from "google-auth-library";
-import { userSchema } from "../utils/schemas/user.ts";
+import { UserRoles, userSchema } from "../utils/schemas/user.ts";
+import Agency from "../models/agency.ts";
+import { agencySchema } from "../utils/schemas/agency.ts";
+import mongoose from "mongoose";
 
 export const signin = async (req: Request, res: Response) => {
   const { success, error } = await signinSchema.safeParseAsync(req.body);
@@ -100,9 +103,25 @@ export const refreshToken = async (
 
 const REDIRECTURI = "http://localhost:8080/api/auth/google/oauth";
 
+enum GoogleOauthSignupType {
+  Create_Agency = "createAgency",
+  Signup = "signup",
+}
+
+type GoogleOauthState = {
+  redirectUrl?: string;
+  to?: string;
+  signupType?: GoogleOauthSignupType;
+};
+
 export const getGoogleOAuthURL = async (req: Request, res: Response) => {
-  const { redirectUrl } = req.query as { redirectUrl?: string };
-  const state = encodeURIComponent(redirectUrl || "http://localhost:3000/");
+  const { redirectUrl, to } = req.query as GoogleOauthState;
+  const state = encodeURIComponent(
+    JSON.stringify({
+      redirectUrl,
+      to,
+    })
+  );
   res.setHeader("Referrer-Policy", "no-refferer-when-downgrade");
   const oAuth2Client = new OAuth2Client({
     clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -129,10 +148,12 @@ export const googleOAuth = async (req: Request, res: Response) => {
     "code" in req.query && typeof req.query.code == "string"
       ? req.query.code
       : null;
-  const state =
+
+  const { redirectUrl, to } = (
     typeof req.query.state === "string"
-      ? decodeURIComponent(req.query.state)
-      : "/";
+      ? JSON.parse(decodeURIComponent(req.query.state))
+      : { to: "http://localhost:3000" }
+  ) as GoogleOauthState;
 
   if (!code) {
     res.status(500).json({ error: "Missing code." });
@@ -169,7 +190,7 @@ export const googleOAuth = async (req: Request, res: Response) => {
 
   if (user) {
     res.cookie("refreshToken", user.generateRefreshToken());
-    res.redirect(state);
+    res.redirect(redirectUrl ?? "http://localhost:3000");
     return;
   }
 
@@ -194,20 +215,29 @@ export const googleOAuth = async (req: Request, res: Response) => {
 
   res.cookie("googleOAuthJWT", serialized);
   res.redirect(
-    `http://localhost:3000/signup/google?redirectUrl=${encodeURIComponent(
-      state
-    )}`
+    `${to}${
+      redirectUrl ? `?redirectUrl=${encodeURIComponent(redirectUrl)}` : ""
+    }`
   );
 };
 
 export const createGoogleOAuthUser = async (req: Request, res: Response) => {
+  const { type } = req.query;
+  const acceptedTypes = ["agency", "user"];
+  if (!type || !acceptedTypes.includes(type.toString())) {
+    res.status(400).json({ error: "Incorrect type" });
+    return;
+  }
+
   const cookies = parse(req.headers.cookie ?? "");
   const googleOAuthJWT = cookies.googleOAuthJWT
     ? cookies.googleOAuthJWT!.split(";")[0].slice("googleOAuthJWT=".length)
     : null;
 
   if (!googleOAuthJWT) {
-    res.status(401).json({ error: "Access denied. No oauth access token." });
+    res
+      .status(401)
+      .json({ error: "Access denied. No google oauth access token." });
     return;
   }
   let googleOAuthPayload;
@@ -218,17 +248,19 @@ export const createGoogleOAuthUser = async (req: Request, res: Response) => {
     ) as jwt.JwtPayload;
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      res.status(401).json({ error: "Access denied. Token expired." });
+      res
+        .status(401)
+        .json({ error: "Access denied. Google oauth token expired." });
       return;
     } else if (error instanceof jwt.JsonWebTokenError) {
-      res.status(401).json({ error: "Access denied. Unauthorized user." });
+      res.status(401).json({ error: "Access denied. Unauthorized attempt." });
       return;
     }
     throw error;
   }
 
   const { success, error, data } = await userSchema
-    .pick({ address: true, phone: true, role: true })
+    .pick({ address: true, phone: true })
     .safeParseAsync(req.body);
 
   if (!success) {
@@ -241,23 +273,57 @@ export const createGoogleOAuthUser = async (req: Request, res: Response) => {
     return;
   }
 
-  const { address, phone, role } = data;
+  const { address, phone } = data;
 
   delete googleOAuthPayload.iat;
   const user = new User({
     ...googleOAuthPayload,
     address,
     phone,
-    role,
+    role: type === "agency" ? UserRoles.OWNER : UserRoles.USER,
   });
 
-  await user.save();
+  let entity;
+  if (type === "user") entity = await user.save();
+  else {
+    const { success, data, error } = await agencySchema.safeParseAsync({
+      ...req.body,
+      owner: user._id.toString(),
+    });
+    if (!success) {
+      res.status(400).json(error.formErrors);
+      return;
+    }
+
+    const { address, name, owner } = data;
+
+    if (await Agency.findOne({ name })) {
+      res.status(400).json({ error: "Agency with this name already exists." });
+      return;
+    }
+
+    const agency = new Agency({ name, address, owner, agents: [user._id] });
+    user.agency = agency._id;
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      await user.save({ session });
+      entity = await (await agency.save({ session })).populate("owner");
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
 
   res.cookie("refreshToken", user.generateRefreshToken());
 
   const accessToken = user.generateAccessToken();
 
-  res.status(200).json({ token: accessToken });
+  res.status(200).json({ token: accessToken, entity });
 };
 
 export const getUserData = async (accessToken: string) =>

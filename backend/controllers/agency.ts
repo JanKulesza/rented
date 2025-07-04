@@ -5,11 +5,7 @@ import {
   agencySchema,
   type AgencySchemaType,
 } from "../utils/schemas/agency.ts";
-import {
-  UserRoles,
-  userSchema,
-  type UserSchemaType,
-} from "../utils/schemas/user.ts";
+import { UserRoles, userSchema } from "../utils/schemas/user.ts";
 import User from "../models/user.ts";
 import Property from "../models/property.ts";
 import jwt from "jsonwebtoken";
@@ -68,15 +64,18 @@ export const createAgency = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { success: userSuccess, error: userError } =
-    await userSchema.safeParseAsync(req.body);
+  const {
+    success: userSuccess,
+    data: userData,
+    error: userError,
+  } = await userSchema.safeParseAsync(req.body);
 
   if (!userSuccess) {
     res.status(400).json(userError.errors);
     return;
   }
 
-  const { firstName, lastName, email, password } = req.body as UserSchemaType;
+  const { firstName, lastName, email, password, address, phone } = userData;
   if (await User.findOne({ email })) {
     res.status(400).json({ error: "User already exists." });
     return;
@@ -87,15 +86,17 @@ export const createAgency = async (
     lastName,
     email,
     password,
+    address,
+    phone,
     role: "owner",
   });
 
-  const { name, location } = req.body as AgencySchemaType;
+  const { name } = req.body as AgencySchemaType;
 
   const { success: agencySuccess, error: agencyError } =
     await agencySchema.safeParseAsync({
       name,
-      location,
+      address,
       owner: owner._id.toString(),
     });
 
@@ -104,9 +105,14 @@ export const createAgency = async (
     return;
   }
 
+  if (await Agency.findOne({ name })) {
+    res.status(400).json({ error: "Agency with this name already exists." });
+    return;
+  }
+
   const agency = new Agency({
     name,
-    location,
+    address,
     owner: owner._id,
     agents: [owner._id],
   });
@@ -153,13 +159,13 @@ export const updateAgency = async (req: Request, res: Response) => {
     return;
   }
 
-  const { name, location } = req.body as AgencySchemaType;
+  const { name, address } = req.body as AgencySchemaType;
 
   const updatedAgency = await Agency.findByIdAndUpdate(
     id,
     {
       name,
-      location,
+      address,
     },
     { new: true }
   ).populate("owner");

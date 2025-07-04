@@ -1,6 +1,7 @@
 import { z } from "zod";
 import mongoose from "mongoose";
 import { ACCEPTED_IMAGE_TYPES } from "./property.ts";
+import { addressSchema } from "./address.ts";
 
 export enum UserRoles {
   OWNER = "owner",
@@ -35,22 +36,7 @@ export const userSchema = z.object({
       message: "Invalid image file type",
     })
     .optional(),
-  address: z.object({
-    city: z
-      .string({ required_error: "City is required." })
-      .min(1, "Provide correct city."),
-    state: z
-      .string({ required_error: "State is required." })
-      .min(2, "Provide correct state."),
-    country: z
-      .string({ required_error: "Country is required." })
-      .min(4, "Provide correct country."),
-    zip: z
-      .string({ required_error: "Zip code is required." })
-      .min(3, "Provide correct zip code.")
-      .max(10, "Zip code is too long."),
-  }),
-  role: z.nativeEnum(UserRoles, { required_error: "role is required" }),
+  address: addressSchema,
   sold: z.number().min(0, "Invalid number,").optional(),
   agency: z
     .string({ required_error: "Agency is required." })

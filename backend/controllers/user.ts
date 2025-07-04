@@ -1,7 +1,11 @@
 import { type NextFunction, type Request, type Response } from "express";
 import User from "../models/user.ts";
 import mongoose from "mongoose";
-import { userSchema, type UserSchemaType } from "../utils/schemas/user.ts";
+import {
+  UserRoles,
+  userSchema,
+  type UserSchemaType,
+} from "../utils/schemas/user.ts";
 import Property from "../models/property.ts";
 import Agency from "../models/agency.ts";
 import { deleteImage, uploadImage } from "../utils/cloudinary.ts";
@@ -36,7 +40,7 @@ export const createUser = async (req: Request, res: Response) => {
     return;
   }
 
-  const { firstName, lastName, email, phone, password, address, role } = data;
+  const { firstName, lastName, email, phone, password, address } = data;
 
   if (await User.findOne({ email })) {
     res.status(400).json({ error: "User already exists." });
@@ -50,7 +54,7 @@ export const createUser = async (req: Request, res: Response) => {
     phone,
     password,
     address,
-    role,
+    role: UserRoles.USER,
   });
 
   const savedUser = await user.save();
@@ -92,7 +96,6 @@ export const updateUser = async (
     phone,
     address,
     sold,
-    role,
     agency,
     properties,
   } = data;
@@ -110,7 +113,6 @@ export const updateUser = async (
     phone,
     address,
     sold,
-    role,
   };
 
   const session = await mongoose.startSession();
