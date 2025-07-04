@@ -3,6 +3,7 @@ import React from "react";
 import { UserRoles } from "../auth/signup-schema";
 import { SigninSchemaType } from "../auth/signin-schema";
 import { Agency, Property } from "./agency-provider";
+import { redirect, usePathname } from "next/navigation";
 
 export interface User {
   _id: string;
@@ -44,6 +45,7 @@ export const authContext = React.createContext<AuthContext>({} as AuthContext);
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = React.useState<string | null>(null);
   const [user, setUser] = React.useState<User | null>(null);
+  const pathname = usePathname();
 
   async function fetchWithAuth<T>(
     endpoint: string | URL | Request,
@@ -128,6 +130,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("signedout", "true");
       setAccessToken(null);
       setUser(null);
+      if (pathname.startsWith("/app") || pathname === "/me") redirect("/");
     }
   };
 
