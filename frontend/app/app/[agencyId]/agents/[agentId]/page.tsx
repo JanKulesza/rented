@@ -56,42 +56,44 @@ const AgentDetailsPage = async ({
             </div>
           </div>
           <table className="w-full border-separate border-spacing-3 text-sm">
-            {agent.agency &&
-              typeof agent.agency === "object" &&
-              "name" in agent.agency && (
-                <tr>
-                  <td className="text-muted-foreground">Agency:</td>
-                  <td>{agent.agency.name}</td>
-                </tr>
-              )}
-            <tr>
-              <td className="text-muted-foreground">Joined at:</td>
-              <td>{format(agent.createdAt, "dd MMMM yyyy")}</td>
-            </tr>
-            <tr>
-              <td className="text-muted-foreground">City:</td>
-              <td>{agent.address.city}</td>
-            </tr>
-            <tr>
-              <td className="text-muted-foreground">State:</td>
-              <td>{agent.address.state}</td>
-            </tr>
-            <tr>
-              <td className="text-muted-foreground">Country:</td>
-              <td>{agent.address.country}</td>
-            </tr>
-            <tr>
-              <td className="text-muted-foreground">Zip code:</td>
-              <td>{agent.address.zip}</td>
-            </tr>
-            <tr>
-              <td className="text-muted-foreground">Email:</td>
-              <td>{agent.email}</td>
-            </tr>
-            <tr>
-              <td className="text-muted-foreground">Phone:</td>
-              <td>{agent.phone}</td>
-            </tr>
+            <tbody>
+              {agent.agency &&
+                typeof agent.agency === "object" &&
+                "name" in agent.agency && (
+                  <tr>
+                    <td className="text-muted-foreground">Agency:</td>
+                    <td>{agent.agency.name}</td>
+                  </tr>
+                )}
+              <tr>
+                <td className="text-muted-foreground">Joined at:</td>
+                <td>{format(agent.createdAt, "dd MMMM yyyy")}</td>
+              </tr>
+              <tr>
+                <td className="text-muted-foreground">City:</td>
+                <td>{agent.address.city}</td>
+              </tr>
+              <tr>
+                <td className="text-muted-foreground">State:</td>
+                <td>{agent.address.state}</td>
+              </tr>
+              <tr>
+                <td className="text-muted-foreground">Country:</td>
+                <td>{agent.address.country}</td>
+              </tr>
+              <tr>
+                <td className="text-muted-foreground">Zip code:</td>
+                <td>{agent.address.zip}</td>
+              </tr>
+              <tr>
+                <td className="text-muted-foreground">Email:</td>
+                <td>{agent.email}</td>
+              </tr>
+              <tr>
+                <td className="text-muted-foreground">Phone:</td>
+                <td>{agent.phone}</td>
+              </tr>
+            </tbody>
           </table>
           <div>
             <div className="flex items-center justify-between text-sm mb-0">
