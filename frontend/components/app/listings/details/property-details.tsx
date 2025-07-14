@@ -12,32 +12,22 @@ import { LivingAreaType } from "../add-property/add-property-schema";
 import { Separator } from "@/components/ui/separator";
 import { AmenityMappings } from "@/entities/amenities";
 import MiniCard from "../../dashboard/mini-card";
-import { Skeleton } from "@/components/ui/skeleton";
-import dynamic from "next/dynamic";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useState } from "react";
 import ShowMore from "@/components/elements/show-more";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import PropertyInsights from "./property-insights";
 import AmenitiesModal from "./amenities-modal";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import useMap from "@/components/elements/map";
 
 interface PropertDetailsProps {
   p: Property;
 }
 
 const PropertyDetails = ({ p }: PropertDetailsProps) => {
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("@/components/elements/map/map"), {
-        loading: () => <Skeleton />,
-        ssr: false,
-      }),
-    []
-  );
-
+  const Map = useMap();
   const [property, setProperty] = useState(p);
-
   const { agencyId } = useParams();
 
   const agent = property.agent ? (property.agent as User) : null;

@@ -1,5 +1,6 @@
 "use client";
 import BackButton from "@/components/elements/back-btn";
+import useMap from "@/components/elements/map";
 import PropertyCarousel from "@/components/elements/property-carousel";
 import {
   agencyContext,
@@ -7,24 +8,15 @@ import {
 } from "@/components/providers/agency-provider";
 import { User } from "@/components/providers/auth-provider";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ListingTypes } from "@/entities/listing-types";
 import { formatAddress } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
-import React, { useContext, useMemo } from "react";
+import { useContext } from "react";
 
 const AgencyDetailsPage = () => {
   const { agency } = useContext(agencyContext);
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("@/components/elements/map/map"), {
-        loading: () => <Skeleton />,
-        ssr: false,
-      }),
-    []
-  );
+  const Map = useMap();
   const properties = agency.properties as Property[];
   const owner = agency.owner as User;
   const cities = properties

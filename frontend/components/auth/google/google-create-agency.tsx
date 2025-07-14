@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -14,18 +14,10 @@ import {
 import FormInput from "@/components/inputs/form-input";
 import { Separator } from "@/components/ui/separator";
 import { Form } from "@/components/ui/form";
-import { Skeleton } from "@/components/ui/skeleton";
-import dynamic from "next/dynamic";
+import useMap from "@/components/elements/map";
 
 const CreateAgencyGoogleForm = () => {
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("@/components/elements/map/map"), {
-        loading: () => <Skeleton />,
-        ssr: false,
-      }),
-    []
-  );
+  const Map = useMap();
   const { setAuth } = useContext(authContext);
   const [isLoading, setIsLoading] = useState(false);
   const [locationCorrect, setLocationCorrect] = useState(false);

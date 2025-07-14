@@ -1,10 +1,8 @@
 import { TabsContent } from "@/components/ui/tabs";
-import dynamic from "next/dynamic";
-import { useMemo } from "react";
 import FormInput from "@/components/inputs/form-input";
 import { useFormContext } from "react-hook-form";
-import { Skeleton } from "@/components/ui/skeleton";
 import { EditAgencyTabEnum } from "./edit-agency";
+import useMap from "@/components/elements/map";
 
 const TabAddress = ({
   setLocationCorrect,
@@ -12,14 +10,7 @@ const TabAddress = ({
   setLocationCorrect: (correct: boolean) => void;
 }) => {
   const form = useFormContext();
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("@/components/elements/map/map"), {
-        loading: () => <Skeleton />,
-        ssr: false,
-      }),
-    []
-  );
+  const Map = useMap();
   return (
     <TabsContent value={EditAgencyTabEnum.Address}>
       <div className="flex max-md:flex-col gap-6">

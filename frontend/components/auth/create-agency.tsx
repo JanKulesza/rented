@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import { Form } from "../ui/form";
 import { createAgencySchema, CreateAgencyType } from "./create-agency-schema";
 import { useForm } from "react-hook-form";
@@ -13,8 +13,7 @@ import { authContext } from "../providers/auth-provider";
 import { toast } from "sonner";
 import GoogleOauthBtn from "./google-oauth-btn";
 import { Separator } from "../ui/separator";
-import dynamic from "next/dynamic";
-import { Skeleton } from "../ui/skeleton";
+import useMap from "../elements/map";
 
 enum CreateAgencyTabs {
   Credentials = "credentials",
@@ -22,14 +21,7 @@ enum CreateAgencyTabs {
 }
 
 const CreateAgencyForm = () => {
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("@/components/elements/map/map"), {
-        loading: () => <Skeleton />,
-        ssr: false,
-      }),
-    []
-  );
+  const Map = useMap();
   const [isLoading, setIsLoading] = useState(false);
   const [locationCorrect, setLocationCorrect] = useState(false);
   const [tab, setTab] = useState<CreateAgencyTabs>(

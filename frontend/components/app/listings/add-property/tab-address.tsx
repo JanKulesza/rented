@@ -1,6 +1,4 @@
 import { TabsContent } from "@/components/ui/tabs";
-import dynamic from "next/dynamic";
-import { useMemo } from "react";
 import { TabEnum } from "./add-property";
 import FormInput from "@/components/inputs/form-input";
 import { useFormContext } from "react-hook-form";
@@ -9,7 +7,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
+import useMap from "@/components/elements/map";
 
 const TabAddress = ({
   setLocationCorrect,
@@ -17,14 +15,7 @@ const TabAddress = ({
   setLocationCorrect: (correct: boolean) => void;
 }) => {
   const form = useFormContext();
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("@/components/elements/map/map"), {
-        loading: () => <Skeleton />,
-        ssr: false,
-      }),
-    []
-  );
+  const Map = useMap();
   return (
     <TabsContent value={TabEnum.Location}>
       <SheetHeader className="mb-3 px-0">
