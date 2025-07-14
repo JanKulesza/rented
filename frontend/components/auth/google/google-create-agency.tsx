@@ -37,6 +37,7 @@ const CreateAgencyGoogleForm = () => {
       name: "",
       phone: "",
       address: {
+        suite: "",
         address: "",
         city: "",
         country: "",

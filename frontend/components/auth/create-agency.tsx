@@ -49,6 +49,7 @@ const CreateAgencyForm = () => {
       name: "",
       phone: "",
       address: {
+        suite: "",
         address: "",
         city: "",
         country: "",
