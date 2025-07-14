@@ -13,9 +13,10 @@ interface Props {
   className?: ClassValue;
   width?: number | string;
   height?: number | string;
+  ratio?: number;
 }
 
-const DragZone = ({ className, width, height }: Props) => {
+const DragZone = ({ className, width, height, ratio }: Props) => {
   const form = useFormContext();
   const [imageUpload, setImageUpload] = useState<string | null>(
     form.getValues("image")
@@ -53,7 +54,7 @@ const DragZone = ({ className, width, height }: Props) => {
   return (
     <>
       <AspectRatio
-        ratio={16 / 9}
+        ratio={ratio ?? 16 / 9}
         style={{ width: width ?? "100%", height: height ?? "100%" }}
         className={cn(
           `rounded-2xl bg-muted/50 relative shadow-xs overflow-hidden border ${

@@ -68,10 +68,10 @@ const PropertyCarousel = ({ properties }: { properties: Property[] }) => {
         </div>
       </div>
 
-      <div className="px-12">
+      <div className="md:px-12">
         {filteredProp.length !== 0 ? (
           <Carousel>
-            <CarouselContent>
+            <CarouselContent className="flex justify-evenly">
               {sort(filteredProp)
                 .desc((p) =>
                   propSorting === "popular" ? p.rating : p.createdAt
@@ -79,15 +79,15 @@ const PropertyCarousel = ({ properties }: { properties: Property[] }) => {
                 .slice(0, 19)
                 .map((p) => (
                   <CarouselItem
-                    className="basis-full md:basis-1/2 lg:basis-1/3"
+                    className="basis-full sm:basis-1/2 xl:basis-1/3 flex justify-center"
                     key={p._id}
                   >
                     <PropertyCard property={p} />
                   </CarouselItem>
                 ))}
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious className="max-md:hidden" />
+            <CarouselNext className="max-md:hidden" />
           </Carousel>
         ) : (
           <p className="text-muted-foreground w-full py-36 text-center">

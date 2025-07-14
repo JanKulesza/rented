@@ -1,5 +1,5 @@
 "use client";
-import { createContext } from "react";
+import { createContext, useState } from "react";
 import { User } from "./auth-provider";
 import {
   AddressType,
@@ -52,26 +52,33 @@ export interface Agency {
   _id: string;
   name: string;
   location: string;
-  owner: string;
+  owner: string | User;
+  image: {
+    id: string;
+    url: string;
+  };
+  address: AddressType;
   agents: string[] | User[];
   properties: string[] | Property[];
 }
 
 interface AgencyContext {
   agency: Agency;
+  setAgency: (agency: Agency) => void;
 }
 
 export const agencyContext = createContext<AgencyContext>({} as AgencyContext);
 
 const AgencyProvider = ({
-  agency,
+  agency: a,
   children,
 }: {
   agency: Agency;
   children: React.ReactNode;
 }) => {
+  const [agency, setAgency] = useState<Agency>(a);
   return (
-    <agencyContext.Provider value={{ agency }}>
+    <agencyContext.Provider value={{ agency, setAgency }}>
       {children}
     </agencyContext.Provider>
   );

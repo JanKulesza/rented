@@ -27,7 +27,7 @@ export const addressSchema = z.object({
     .max(10, "Zip code is too long."),
   address: z
     .string({ required_error: "Address is required." })
-    .min(5, "Provide correct address."),
+    .min(1, "Provide correct address."),
   suite: z.string().optional(),
   lat: z
     .number({ required_error: "Latitude is required." })

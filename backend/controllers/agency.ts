@@ -9,6 +9,7 @@ import { UserRoles, userSchema } from "../utils/schemas/user.ts";
 import User from "../models/user.ts";
 import Property from "../models/property.ts";
 import jwt from "jsonwebtoken";
+import { deleteImage, uploadImage } from "../utils/cloudinary.ts";
 
 export const getAgencies = async (req: Request, res: Response) => {
   const { populate } = req.query;
@@ -75,7 +76,14 @@ export const createAgency = async (
     return;
   }
 
-  const { firstName, lastName, email, password, address, phone } = userData;
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    address: userAddress,
+    phone,
+  } = userData;
   if (await User.findOne({ email })) {
     res.status(400).json({ error: "User already exists." });
     return;
@@ -86,19 +94,22 @@ export const createAgency = async (
     lastName,
     email,
     password,
-    address,
+    address: userAddress,
     phone,
     role: "owner",
   });
 
   const { name } = req.body as AgencySchemaType;
 
-  const { success: agencySuccess, error: agencyError } =
-    await agencySchema.safeParseAsync({
-      name,
-      address,
-      owner: owner._id.toString(),
-    });
+  const {
+    success: agencySuccess,
+    data: agencyData,
+    error: agencyError,
+  } = await agencySchema.safeParseAsync({
+    name,
+    address: req.body.address,
+    owner: owner._id.toString(),
+  });
 
   if (!agencySuccess) {
     res.status(400).json(agencyError.errors);
@@ -109,10 +120,10 @@ export const createAgency = async (
     res.status(400).json({ error: "Agency with this name already exists." });
     return;
   }
-
+  const { address: agencyAddress } = agencyData;
   const agency = new Agency({
     name,
-    address,
+    address: agencyAddress,
     owner: owner._id,
     agents: [owner._id],
   });
@@ -137,7 +148,11 @@ export const createAgency = async (
   }
 };
 
-export const updateAgency = async (req: Request, res: Response) => {
+export const updateAgency = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { id } = req.params;
   if (!mongoose.isValidObjectId(id)) {
     res.status(400).json({ error: "Invalid object id." });
@@ -150,7 +165,7 @@ export const updateAgency = async (req: Request, res: Response) => {
     return;
   }
 
-  const { success, error } = await agencySchema
+  const { success, error, data } = await agencySchema
     .partial()
     .safeParseAsync(req.body);
 
@@ -158,19 +173,31 @@ export const updateAgency = async (req: Request, res: Response) => {
     res.status(400).json(error.formErrors);
     return;
   }
+  const { name, address } = data;
 
-  const { name, address } = req.body as AgencySchemaType;
+  if (await Agency.findOne({ name })) {
+    res.status(400).json({ error: "Agency with this name already exists." });
+    return;
+  }
 
-  const updatedAgency = await Agency.findByIdAndUpdate(
-    id,
-    {
-      name,
-      address,
-    },
-    { new: true }
-  ).populate("owner");
+  const updateData: Partial<AgencySchemaType> = { name, address };
 
-  res.json(updatedAgency);
+  if (req.file) {
+    const imageData = await uploadImage(req.file.path);
+    updateData.image = imageData;
+  }
+
+  try {
+    const updatedAgency = await Agency.findByIdAndUpdate(id, updateData, {
+      new: true,
+    }).populate(["owner", "properties", "agents"]);
+
+    res.json(updatedAgency);
+  } catch (error) {
+    if (updateData.image) await deleteImage(updateData.image.id);
+
+    next(error);
+  }
 };
 
 export const deleteAgency = async (
@@ -196,12 +223,19 @@ export const deleteAgency = async (
   try {
     await agency.deleteOne({ session });
 
-    await User.find({ agency: agency._id }, { session }).deleteMany({
-      session,
-    });
-    await Property.find({ agency: agency._id }, { session }).deleteMany({
-      session,
-    });
+    await User.updateMany(
+      { agency: agency._id },
+      { agency: null, role: UserRoles.USER, properties: [] },
+      {
+        session,
+      }
+    );
+    await Property.deleteMany(
+      { agency: agency._id },
+      {
+        session,
+      }
+    );
 
     await session.commitTransaction();
     res.json({});

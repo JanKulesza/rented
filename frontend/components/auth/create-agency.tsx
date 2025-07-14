@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Form } from "../ui/form";
 import { createAgencySchema, CreateAgencyType } from "./create-agency-schema";
 import { useForm } from "react-hook-form";
@@ -13,6 +13,8 @@ import { authContext } from "../providers/auth-provider";
 import { toast } from "sonner";
 import GoogleOauthBtn from "./google-oauth-btn";
 import { Separator } from "../ui/separator";
+import dynamic from "next/dynamic";
+import { Skeleton } from "../ui/skeleton";
 
 enum CreateAgencyTabs {
   Credentials = "credentials",
@@ -20,7 +22,16 @@ enum CreateAgencyTabs {
 }
 
 const CreateAgencyForm = () => {
+  const Map = useMemo(
+    () =>
+      dynamic(() => import("@/components/elements/map/map"), {
+        loading: () => <Skeleton />,
+        ssr: false,
+      }),
+    []
+  );
   const [isLoading, setIsLoading] = useState(false);
+  const [locationCorrect, setLocationCorrect] = useState(false);
   const [tab, setTab] = useState<CreateAgencyTabs>(
     CreateAgencyTabs.Credentials
   );
@@ -29,18 +40,43 @@ const CreateAgencyForm = () => {
 
   const form = useForm<CreateAgencyType>({
     resolver: zodResolver(createAgencySchema),
-    defaultValues: {},
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      password: "",
+      confirmPassword: "",
+      email: "",
+      name: "",
+      phone: "",
+      address: {
+        address: "",
+        city: "",
+        country: "",
+        state: "",
+        zip: "",
+      },
+    },
   });
 
   const onSubmit = async (values: CreateAgencyType) => {
     setIsLoading(true);
+    const formData = new FormData();
+    for (const key in values) {
+      if (key !== "address") {
+        const value = values[key as keyof typeof values];
+        if (value && typeof value !== "object") {
+          formData.append(key, String(value));
+        }
+      }
+    }
+
+    Object.entries(values.address!).forEach(([field, val]) => {
+      formData.append(`address[${field}]`, String(val));
+    });
     try {
       const res = await fetch("http://localhost:8080/api/agencies", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...values, role: "owner" }),
+        body: formData,
       });
 
       const data = await res.json();
@@ -156,30 +192,54 @@ const CreateAgencyForm = () => {
             <p className="text-sm text-muted-foreground my-2 px-1">
               This address will be used for both the owner and the agency.
             </p>
-            <div className="flex max-md:flex-col gap-3 items-baseline md:justify-between">
-              <FormInput
-                name="address.city"
-                label="City"
-                placeholder="Warsaw"
-                className="md:w-2/3"
-              />
-              <FormInput
-                name="address.zip"
-                label="Zip code"
-                placeholder="00-001"
-                className="md:w-1/3"
+            <div className="flex max-md:flex-col gap-6">
+              <div className="md:w-2/3 space-y-6 ">
+                <FormInput
+                  name="address.address"
+                  label="Address"
+                  placeholder="Address"
+                />
+                <FormInput
+                  name="address.suite"
+                  label="Suite"
+                  placeholder="Suite (optional)"
+                />
+                <FormInput
+                  name="address.city"
+                  label="City"
+                  placeholder="City"
+                />
+                <FormInput
+                  name="address.state"
+                  label="State"
+                  placeholder="State"
+                />
+                <FormInput
+                  name="address.country"
+                  label="Country"
+                  placeholder="Country"
+                />
+                <FormInput
+                  name="address.zip"
+                  label="Zip Code"
+                  placeholder="Zip Code"
+                />
+              </div>
+              <Map
+                startPosition={[52.23, 21.01]}
+                addr={form.watch("address")}
+                useRecenter
+                height="475px"
+                onRecenter={(location) => {
+                  if (!location) setLocationCorrect(false);
+                  else {
+                    form.setValue("address.lat", +location.lat);
+                    form.setValue("address.lon", +location.lon);
+                    setLocationCorrect(true);
+                  }
+                }}
               />
             </div>
-            <FormInput
-              name="address.state"
-              label="State"
-              placeholder="Mazowieckie"
-            />
-            <FormInput
-              name="address.country"
-              label="Country"
-              placeholder="Poland"
-            />
             <Separator className="my-2" />
             <FormInput
               name="phone"
@@ -193,6 +253,7 @@ const CreateAgencyForm = () => {
                 variant="default"
                 type="submit"
                 className="cursor-pointer"
+                disabled={!locationCorrect}
               >
                 {isLoading ? <Spinner /> : "Sign Up"}
               </Button>

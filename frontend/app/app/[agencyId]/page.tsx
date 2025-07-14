@@ -11,7 +11,7 @@ import ListingsCarousel from "@/components/app/dashboard/carousel";
 const AgencyDashboard = async ({
   params,
 }: {
-  params: { agencyId: string };
+  params: Promise<{ agencyId: string }>;
 }) => {
   const { agencyId } = await params;
 

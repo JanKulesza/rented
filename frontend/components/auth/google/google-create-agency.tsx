@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -14,10 +14,21 @@ import {
 import FormInput from "@/components/inputs/form-input";
 import { Separator } from "@/components/ui/separator";
 import { Form } from "@/components/ui/form";
+import { Skeleton } from "@/components/ui/skeleton";
+import dynamic from "next/dynamic";
 
 const CreateAgencyGoogleForm = () => {
+  const Map = useMemo(
+    () =>
+      dynamic(() => import("@/components/elements/map/map"), {
+        loading: () => <Skeleton />,
+        ssr: false,
+      }),
+    []
+  );
   const { setAuth } = useContext(authContext);
   const [isLoading, setIsLoading] = useState(false);
+  const [locationCorrect, setLocationCorrect] = useState(false);
   const router = useRouter();
 
   const form = useForm<CreateAgencyGoogleSchema>({
@@ -26,6 +37,7 @@ const CreateAgencyGoogleForm = () => {
       name: "",
       phone: "",
       address: {
+        address: "",
         city: "",
         country: "",
         state: "",
@@ -35,20 +47,20 @@ const CreateAgencyGoogleForm = () => {
   });
 
   const onSubmit = async (values: CreateAgencyGoogleSchema) => {
-    const { address, phone, name } = values;
     setIsLoading(true);
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("phone", values.phone);
+    Object.entries(values.address!).forEach(([field, val]) => {
+      formData.append(`address[${field}]`, String(val));
+    });
 
     try {
       const res = await fetch(
         "http://localhost:8080/api/auth/google/signup?type=agency",
         {
           method: "POST",
-          body: JSON.stringify({
-            phone,
-            address,
-            name,
-          }),
-          headers: { "Content-Type": "application/json" },
+          body: formData,
           credentials: "include",
         }
       );
@@ -93,30 +105,46 @@ const CreateAgencyGoogleForm = () => {
         <p className="text-sm text-muted-foreground my-2 px-1">
           This address will be used for both the owner and the agency.
         </p>
-        <div className="flex max-md:flex-col gap-3 items-baseline md:justify-between">
-          <FormInput
-            name="address.city"
-            label="City"
-            placeholder="Warsaw"
-            className="md:w-2/3"
-          />
-          <FormInput
-            name="address.zip"
-            label="Zip code"
-            placeholder="00-001"
-            className="md:w-1/3"
+        <div className="flex max-md:flex-col gap-6">
+          <div className="md:w-2/3 space-y-6 ">
+            <FormInput
+              name="address.address"
+              label="Address"
+              placeholder="Address"
+            />
+            <FormInput
+              name="address.suite"
+              label="Suite"
+              placeholder="Suite (optional)"
+            />
+            <FormInput name="address.city" label="City" placeholder="City" />
+            <FormInput name="address.state" label="State" placeholder="State" />
+            <FormInput
+              name="address.country"
+              label="Country"
+              placeholder="Country"
+            />
+            <FormInput
+              name="address.zip"
+              label="Zip Code"
+              placeholder="Zip Code"
+            />
+          </div>
+          <Map
+            startPosition={[52.23, 21.01]}
+            addr={form.watch("address")}
+            useRecenter
+            height="475px"
+            onRecenter={(location) => {
+              if (!location) setLocationCorrect(false);
+              else {
+                form.setValue("address.lat", +location.lat);
+                form.setValue("address.lon", +location.lon);
+                setLocationCorrect(true);
+              }
+            }}
           />
         </div>
-        <FormInput
-          name="address.state"
-          label="State"
-          placeholder="Mazowieckie"
-        />
-        <FormInput
-          name="address.country"
-          label="Country"
-          placeholder="Poland"
-        />
         <Separator className="my-2" />
         <FormInput
           name="phone"
@@ -125,7 +153,12 @@ const CreateAgencyGoogleForm = () => {
           description="This is the user's personal phone number"
           className="mb-8"
         />
-        <Button variant="default" type="submit" className="w-full">
+        <Button
+          variant="default"
+          type="submit"
+          className="w-full"
+          disabled={!locationCorrect}
+        >
           {isLoading ? <Spinner /> : "Sign Up"}
         </Button>
       </form>
