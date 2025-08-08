@@ -151,14 +151,14 @@ const CreateAgencyForm = () => {
                 label="Password"
                 type="password"
                 placeholder="Enter your Password"
-                className="sm:w-1/2"
+                className="w-full sm:w-1/2"
               />
               <FormInput
                 name="confirmPassword"
                 label="Confirm Password"
                 type="password"
                 placeholder="Confirm Password"
-                className="sm:w-1/2"
+                className="w-full sm:w-1/2"
               />
             </div>
             <Button

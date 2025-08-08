@@ -4,7 +4,6 @@ import logo from "@/app/icon.svg";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ModeToggle } from "@/components/ui/mode-toggle";
 import { authContext } from "../providers/auth-provider";
 import { usePathname } from "next/navigation";
 import ProfileDropdown from "../elements/profile-dropdown";
@@ -25,11 +24,13 @@ const NavBar = () => {
       </Link>
 
       <div className="flex gap-4 items-center">
-        <Link href="/start-renting">
-          <Button variant="ghost" className="cursor-pointer" size="lg">
-            Start renting
-          </Button>
-        </Link>
+        {!user?.agency && (
+          <Link href="/start-renting">
+            <Button variant="ghost" className="max-sm:hidden" size="lg">
+              Start renting
+            </Button>
+          </Link>
+        )}
 
         {!user ? (
           <Link href="/signin">
@@ -40,8 +41,6 @@ const NavBar = () => {
         ) : (
           <ProfileDropdown user={user} />
         )}
-
-        <ModeToggle />
       </div>
     </div>
   );

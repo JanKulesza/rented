@@ -11,7 +11,6 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import {
   Building2,
-  ChevronsUpDown,
   CircleHelp,
   CircleUser,
   DoorOpen,
@@ -22,9 +21,12 @@ import Link from "next/link";
 import { useContext } from "react";
 import rentedIcon from "@/app/icon.svg";
 import { UserRoles } from "../auth/signup-schema";
+import { ModeToggle } from "../ui/mode-toggle";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ProfileDropdown = ({ user }: { user: User }) => {
   const { signout } = useContext(authContext);
+  const isMobile = useIsMobile();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -40,14 +42,15 @@ const ProfileDropdown = ({ user }: { user: User }) => {
             width={44}
             className="rounded-4xl"
           />
-          <div className="flex flex-col items-baseline">
-            <span>{user.firstName + " " + user.lastName}</span>
-            <span className="text-muted-foreground">{user.email}</span>
-          </div>
-          <ChevronsUpDown style={{ height: 20, width: 20 }} />
+          {!isMobile && (
+            <div className="flex flex-col items-baseline">
+              <span>{user.firstName + " " + user.lastName}</span>
+              <span className="text-muted-foreground">{user.email}</span>
+            </div>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-64 mt-3 bg-sidebar">
+      <DropdownMenuContent className="sm:w-64 m-1.5 bg-sidebar">
         {[UserRoles.OWNER, UserRoles.AGENT].includes(user.role) && (
           <>
             <DropdownMenuItem asChild>
@@ -107,6 +110,9 @@ const ProfileDropdown = ({ user }: { user: User }) => {
             </DropdownMenuItem>
           </>
         )}
+        <DropdownMenuItem className="text-center" asChild>
+          <ModeToggle />
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={signout}

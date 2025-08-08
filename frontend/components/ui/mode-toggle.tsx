@@ -12,6 +12,7 @@ export function ModeToggle() {
   return (
     <Button
       variant="outline"
+      className="w-full"
       size="icon"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
     >
