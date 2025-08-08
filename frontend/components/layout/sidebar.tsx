@@ -58,7 +58,7 @@ const AppSidebar = ({ agencyId }: { agencyId: string }) => {
   ];
   return (
     // Navbar height
-    <Sidebar collapsible="icon" className="top-[10vh] h-[90vh]">
+    <Sidebar collapsible="icon" className="top-[10vh] border-none h-[90vh]">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>

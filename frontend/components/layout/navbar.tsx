@@ -14,7 +14,7 @@ const NavBar = () => {
 
   return (
     <div
-      className={`h-[10vh] bg-sidebar border-sidebar-border border-b flex justify-between px-3 ${
+      className={`h-[10vh] bg-sidebar flex justify-between px-3 ${
         !path.startsWith("/app") && "lg:px-10"
       } py-6 top-0 items-center fixed w-full z-50`}
     >

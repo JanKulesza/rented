@@ -17,6 +17,8 @@ interface FormInputProps extends InputProps {
   label: string;
   icon?: ReactNode;
   description?: string;
+  inputClassName?: string;
+  hideMessage?: boolean;
 }
 
 const FormInput = (props: FormInputProps) => {
@@ -32,12 +34,12 @@ const FormInput = (props: FormInputProps) => {
             {props.label} {props.icon}
           </FormLabel>
           <FormControl>
-            <Input {...props} {...field} className="" />
+            <Input {...props} {...field} className={props.inputClassName} />
           </FormControl>
           {props.description && (
             <FormDescription>{props.description}</FormDescription>
           )}
-          <FormMessage />
+          <FormMessage hidden={props.hideMessage} />
         </FormItem>
       )}
     />
