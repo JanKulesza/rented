@@ -24,7 +24,7 @@ app.use(upload.single("image"));
 setupRoutes(app);
 
 // Sentry
-Sentry.setupExpressErrorHandler(app);
+//Sentry.setupExpressErrorHandler(app);
 
 // Error handler
 app.use(handleError);

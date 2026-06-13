@@ -1,6 +1,6 @@
 import { configDotenv } from "dotenv";
 import { configCloudinary } from "./cloudinary.ts";
-import * as Sentry from "@sentry/node";
+//import * as Sentry from "@sentry/node";
 
 configDotenv();
 const {
@@ -8,7 +8,7 @@ const {
   ACCESS_SECRET,
   REFRESH_SECRET,
   JWT_SECRET,
-  SENTRY_DSN,
+  //SENTRY_DSN,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
 } = process.env;
@@ -18,14 +18,14 @@ if (
   !ACCESS_SECRET ||
   !REFRESH_SECRET ||
   !JWT_SECRET ||
-  !SENTRY_DSN ||
+  //!SENTRY_DSN ||
   !GOOGLE_CLIENT_ID ||
   !GOOGLE_CLIENT_SECRET
 )
   throw new Error("FATAL ERROR: environmental variables are not defined.");
 
-Sentry.init({
-  dsn: SENTRY_DSN,
-});
+// Sentry.init({
+//   dsn: SENTRY_DSN,
+// });
 
 configCloudinary();

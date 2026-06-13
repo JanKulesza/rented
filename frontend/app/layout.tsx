@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
+// @ts-ignore
 import "./globals.css";
 import NavBar from "@/components/layout/navbar";
 import { ThemeProvider } from "@/components/ui/theme-provider";
