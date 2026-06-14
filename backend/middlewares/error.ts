@@ -1,5 +1,6 @@
 import { MongooseError } from "mongoose";
 import { type Response, type Request, type NextFunction } from "express";
+import formatErrRes from "../utils/format-err-res.ts";
 
 export const handleError = (
   err: Error,
@@ -9,7 +10,7 @@ export const handleError = (
   _next: NextFunction
 ) => {
   // Send a response
-  res.status(500).json({ error: "An unexpected error occurred." });
+  res.status(500).json(formatErrRes("An unexpected error occurred."));
 
   if (process.env.NODE_ENV !== "development") return;
 

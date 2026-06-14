@@ -10,40 +10,20 @@ import User from "../models/user.ts";
 import Property from "../models/property.ts";
 import jwt from "jsonwebtoken";
 import { deleteImage, uploadImage } from "../utils/cloudinary.ts";
+import formatErrRes from "../utils/format-err-res.ts";
 
-export const getAgencies = async (req: Request, res: Response) => {
-  const { populate } = req.query;
-  enum PopulateEnum {
-    "owner",
-    "agents",
-    "properties",
-  }
-
-  if (!populate) {
-    const agencies = await Agency.find();
-    res.json(agencies);
-    return;
-  }
-
-  if (!Array.isArray(populate)) {
-    res.status(400).json({ error: "Invalid populate query type." });
-    return;
-  }
-  let isValid = true;
-  for (const val of populate)
-    if (!Object.values(PopulateEnum).includes(val.toString())) isValid = false;
-
-  const agencies = await Agency.find().populate(
-    isValid && populate ? populate.map((p) => p.toString()) : []
-  );
+// Return all agencies without populating the owner, properties, and agents fields. This is to avoid sending too much data to the client.
+export const getAgencies = async (req: Request, res: Response, next: NextFunction) => {
+  const agencies = await Agency.find()
 
   res.json(agencies);
 };
 
+//Return agency by id with all data
 export const getAgency = async (req: Request, res: Response) => {
   const { id } = req.params;
   if (!mongoose.isValidObjectId(id)) {
-    res.status(400).json({ error: "Invalid object id." });
+    res.status(400).json(formatErrRes("Invalid obejct id."));
     return;
   }
   const agency = await Agency.findById(id).populate([
@@ -53,13 +33,15 @@ export const getAgency = async (req: Request, res: Response) => {
   ]);
 
   if (!agency) {
-    res.status(404).json({ error: "Agency not found." });
+    res.status(404).json(formatErrRes("Agency not found."))
     return;
   }
 
   res.json(agency);
 };
 
+// Create agency, for simplification the relation between agencies and owner is 1-1, meaning 1 user can have only 1 agency.
+// This might be changed later
 export const createAgency = async (
   req: Request,
   res: Response,
@@ -72,59 +54,40 @@ export const createAgency = async (
   } = await userSchema.safeParseAsync(req.body);
 
   if (!userSuccess) {
-    res.status(400).json(userError.errors);
+    res.status(400).json(formatErrRes("Validation failed.", userError));
     return;
   }
 
-  const {
-    firstName,
-    lastName,
-    email,
-    password,
-    address: userAddress,
-    phone,
-  } = userData;
-  if (await User.findOne({ email })) {
-    res.status(400).json({ error: "User already exists." });
+  if (await User.findOne({ email: userData.email })) {
+    res.status(409).json(formatErrRes("User already exists."));
     return;
   }
 
   const owner = new User({
-    firstName,
-    lastName,
-    email,
-    password,
-    address: userAddress,
-    phone,
+    ...userData,
     role: "owner",
   });
-
-  const { name } = req.body as AgencySchemaType;
-
+  
   const {
     success: agencySuccess,
     data: agencyData,
     error: agencyError,
   } = await agencySchema.safeParseAsync({
-    name,
-    address: req.body.address,
+    ...req.body,
     owner: owner._id.toString(),
   });
 
   if (!agencySuccess) {
-    res.status(400).json(agencyError.errors);
+    res.status(400).json(formatErrRes("Validation failed.", agencyError));
     return;
   }
 
-  if (await Agency.findOne({ name })) {
-    res.status(400).json({ error: "Agency with this name already exists." });
+  if (await Agency.findOne({ name: agencyData.name })) {
+    res.status(409).json({ error: "Agency with this name already exists." });
     return;
   }
-  const { address: agencyAddress } = agencyData;
   const agency = new Agency({
-    name,
-    address: agencyAddress,
-    owner: owner._id,
+    ...agencyData,
     agents: [owner._id],
   });
   owner.agency = agency._id;
@@ -134,12 +97,10 @@ export const createAgency = async (
 
   try {
     await owner.save({ session });
-    const savedAgency = await agency.save({ session });
-
-    const populatedAgency = await savedAgency.populate("owner");
+    const savedAgency = await agency.save({ session })
 
     await session.commitTransaction();
-    res.status(201).json(populatedAgency);
+    res.status(201).json(await savedAgency.populate("owner"));
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -148,6 +109,7 @@ export const createAgency = async (
   }
 };
 
+// Update agency
 export const updateAgency = async (
   req: Request,
   res: Response,
@@ -155,13 +117,13 @@ export const updateAgency = async (
 ) => {
   const { id } = req.params;
   if (!mongoose.isValidObjectId(id)) {
-    res.status(400).json({ error: "Invalid object id." });
+    res.status(400).json(formatErrRes("Invalid object id."));
     return;
   }
   const agency = await Agency.findById(id);
 
   if (!agency) {
-    res.status(404).json({ error: "Agency not found." });
+    res.status(404).json(formatErrRes("Agency not found."));
     return;
   }
 
@@ -170,22 +132,20 @@ export const updateAgency = async (
     .safeParseAsync(req.body);
 
   if (!success) {
-    res.status(400).json(error.formErrors);
+    res.status(400).json(formatErrRes("Validation failed.", error));
     return;
   }
   const { name, address } = data;
 
   if (await Agency.findOne({ name })) {
-    res.status(400).json({ error: "Agency with this name already exists." });
+    res.status(400).json(formatErrRes("Agency with this name already exists."));
     return;
   }
 
   const updateData: Partial<AgencySchemaType> = { name, address };
 
-  if (req.file) {
-    const imageData = await uploadImage(req.file.path);
-    updateData.image = imageData;
-  }
+  if (req.file) 
+    updateData.image = await uploadImage(req.file.path);
 
   try {
     const updatedAgency = await Agency.findByIdAndUpdate(id, updateData, {
@@ -200,6 +160,7 @@ export const updateAgency = async (
   }
 };
 
+// Delete agency. Delete properties assosiated with the agency and change agents role to User.
 export const deleteAgency = async (
   req: Request,
   res: Response,
@@ -207,14 +168,14 @@ export const deleteAgency = async (
 ) => {
   const { id } = req.params;
   if (!mongoose.isValidObjectId(id)) {
-    res.status(400).json({ error: "Invalid object id." });
+    res.status(400).json(formatErrRes("Invalid object id."));
     return;
   }
 
   const agency = await Agency.findById(id);
 
   if (!agency) {
-    res.status(404).json({ error: "Agency not found." });
+    res.status(404).json(formatErrRes("Agency not found."));
     return;
   }
 
@@ -247,12 +208,14 @@ export const deleteAgency = async (
   }
 };
 
+// Generates token for joining agency. Returns {token: string}
 export const generateAddUserToken = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   const agency = await Agency.findById(id);
   if (!agency) {
-    res.status(404).json({ error: "Agency not found." });
+    res.status(404).json(formatErrRes("Agency not found."));
+    return;
   }
 
   const token = jwt.sign({ agencyId: id }, process.env.JWT_SECRET!, {
@@ -262,6 +225,7 @@ export const generateAddUserToken = async (req: Request, res: Response) => {
   res.json({ token });
 };
 
+// Join agency, requires valid jwt.
 export const joinAgency = async (
   req: Request,
   res: Response,
@@ -269,17 +233,10 @@ export const joinAgency = async (
 ) => {
   const { token, userId } = req.body;
   if (!token || typeof token !== "string") {
-    res.status(400).json({ error: "Token is required." });
+    res.status(400).json(formatErrRes("Token is required."));
     return;
   }
-
-  const user = await User.findById(userId);
-
-  if (!user) {
-    res.status(404).json({ error: "User not found." });
-    return;
-  }
-
+  
   let payload;
   try {
     payload = jwt.verify(token, process.env.JWT_SECRET!) as {
@@ -287,26 +244,34 @@ export const joinAgency = async (
     } & jwt.JwtPayload;
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      res.status(401).json({ error: "Invitation expired." });
+      res.status(401).json(formatErrRes("Invitation expired."));
       return;
-    } else if (error instanceof jwt.JsonWebTokenError) {
-      res.status(401).json({ error: "Invalid token." });
+    } 
+    if (error instanceof jwt.JsonWebTokenError) {
+      res.status(401).json(formatErrRes("Invalid token."));
       return;
     }
     return next(error);
   }
+  
+  const user = await User.findById(userId);
 
+  if (!user) {
+    res.status(404).json(formatErrRes("User not found."));
+    return;
+  }
+  
   const agency = await Agency.findById(payload.agencyId);
 
   if (!agency) {
-    res.status(400).json({ error: "Invalid agency id." });
+    res.status(400).json(formatErrRes("Invalid agency id."));
     return;
   }
 
   if (user.agency?.toString() === agency._id.toString()) {
     res
       .status(400)
-      .json({ error: `User is already an agent of ${agency.name}` });
+      .json(formatErrRes(`User is already an agent of ${agency.name}`));
     return;
   }
 
