@@ -3,12 +3,6 @@ import mongoose from "mongoose";
 import { ACCEPTED_IMAGE_TYPES } from "./property.ts";
 import { addressSchema } from "./address.ts";
 
-export enum UserRoles {
-  OWNER = "owner",
-  AGENT = "agent",
-  USER = "user",
-}
-
 const phoneRegex = new RegExp(
   /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
 );

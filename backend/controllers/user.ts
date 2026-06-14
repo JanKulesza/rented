@@ -2,13 +2,13 @@ import { type NextFunction, type Request, type Response } from "express";
 import User from "../models/user.ts";
 import mongoose from "mongoose";
 import {
-  UserRoles,
   userSchema,
   type UserSchemaType,
-} from "../utils/schemas/user.ts";
+} from "../schemas/user.ts";
 import Property from "../models/property.ts";
 import Agency from "../models/agency.ts";
 import { deleteImage, uploadImage } from "../utils/cloudinary.ts";
+import { UserRoles } from "../types/user.ts";
 
 export const getUsers = async (req: Request, res: Response) => {
   const users = await User.find();
@@ -54,7 +54,7 @@ export const createUser = async (req: Request, res: Response) => {
     phone,
     password,
     address,
-    role: UserRoles.USER,
+    role: UserRoles.User,
   });
 
   const savedUser = await user.save();

@@ -2,13 +2,13 @@ import { type NextFunction, type Request, type Response } from "express";
 import Property from "../models/property.ts";
 import mongoose from "mongoose";
 import {
-  ListingTypes,
   propertySchema,
   type PropertySchemaType,
-} from "../utils/schemas/property.ts";
+} from "../schemas/property.ts";
 import Agency from "../models/agency.ts";
 import User from "../models/user.ts";
 import { deleteImage, uploadImage } from "../utils/cloudinary.ts";
+import { ListingTypes } from "../types/property.ts";
 
 export const getProperties = async (req: Request, res: Response) => {
   const properties = await Property.find();
@@ -48,12 +48,12 @@ export const createProperty = async (
   }
   const { agency, agent, listingType } = data;
 
-  if (listingType !== ListingTypes.PENDING && !agent) {
+  if (listingType !== ListingTypes.Pending && !agent) {
     res.status(400).json({ error: "Agent is required for this listing type." });
     return;
   }
-  if (listingType === ListingTypes.PENDING && agent) {
-    res.status(400).json({ error: "Cannot assign agent to pending property." });
+  if (listingType === ListingTypes.Pending && agent) {
+    res.status(400).json({ error: "Cannot assign agent to Pending property." });
     return;
   }
 
@@ -64,7 +64,7 @@ export const createProperty = async (
   }
 
   if (
-    listingType !== ListingTypes.PENDING &&
+    listingType !== ListingTypes.Pending &&
     !assignedAgency.agents.includes(
       new mongoose.Types.ObjectId(agent?.toString())
     )
@@ -90,7 +90,7 @@ export const createProperty = async (
       { session }
     );
 
-    if (listingType !== ListingTypes.PENDING)
+    if (listingType !== ListingTypes.Pending)
       await User.findByIdAndUpdate(
         agent,
         { $push: { properties: savedProperty._id } },
@@ -160,12 +160,12 @@ export const updateProperty = async (
     squareFootage,
   } = data;
 
-  if (listingType !== ListingTypes.PENDING && !agent) {
+  if (listingType !== ListingTypes.Pending && !agent) {
     res.status(400).json({ error: "Agent is required for this listing type." });
     return;
   }
-  if (listingType === ListingTypes.PENDING && agent) {
-    res.status(400).json({ error: "Cannot assign agent to pending property." });
+  if (listingType === ListingTypes.Pending && agent) {
+    res.status(400).json({ error: "Cannot assign agent to Pending property." });
     return;
   }
 
@@ -207,7 +207,7 @@ export const updateProperty = async (
         );
 
       updateData.agent = agent;
-    } else if (!agent && listingType === ListingTypes.PENDING) {
+    } else if (!agent && listingType === ListingTypes.Pending) {
       await User.findByIdAndUpdate(
         property.agent,
         { $pull: { properties: property._id } },

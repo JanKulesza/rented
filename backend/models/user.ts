@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { deleteImage } from "../utils/cloudinary.ts";
-import { UserRoles } from "../utils/schemas/user.ts";
+import { UserRoles } from "../types/user.ts";
 import { serialize } from "cookie";
 import jwt from "jsonwebtoken";
 

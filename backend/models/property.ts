@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
-import {
-  Amenity,
-  ListingTypes,
-  PropertyTypes,
-} from "../utils/schemas/property.ts";
 import { deleteImage } from "../utils/cloudinary.ts";
+import { Amenities, ListingTypes, PropertyTypes } from "../types/property.ts";
 
 const RENTEDMARGIN = 1.1;
 
@@ -50,7 +46,7 @@ const propertySchema = new mongoose.Schema(
       default: null,
       _id: false,
     },
-    amenities: { type: [String], enum: Amenity, default: [] },
+    amenities: { type: [String], enum: Amenities, default: [] },
     agency: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Agency",

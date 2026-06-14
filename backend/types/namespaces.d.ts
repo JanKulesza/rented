@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { UserRoles } from "../utils/schemas/user.ts";
+import { UserRoles } from "./user.ts";
 
 declare global {
   namespace Express {

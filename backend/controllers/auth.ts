@@ -1,14 +1,15 @@
 import { type NextFunction, type Request, type Response } from "express";
-import { signinSchema, type SigninSchemaType } from "../utils/schemas/auth.ts";
+import { signinSchema, type SigninSchemaType } from "../schemas/auth.ts";
 import jwt from "jsonwebtoken";
 import User, { OAuthProviders } from "../models/user.ts";
 import { parse, serialize } from "cookie";
 import { isPast, addDays, fromUnixTime } from "date-fns";
 import { OAuth2Client } from "google-auth-library";
-import { UserRoles, userSchema } from "../utils/schemas/user.ts";
+import { userSchema } from "../schemas/user.ts";
 import Agency from "../models/agency.ts";
-import { agencySchema } from "../utils/schemas/agency.ts";
+import { agencySchema } from "../schemas/agency.ts";
 import mongoose from "mongoose";
+import { UserRoles } from "../types/user.ts";
 
 export const signin = async (req: Request, res: Response) => {
   const { success, error } = await signinSchema.safeParseAsync(req.body);
@@ -215,8 +216,7 @@ export const googleOAuth = async (req: Request, res: Response) => {
 
   res.cookie("googleOAuthJWT", serialized);
   res.redirect(
-    `${to}${
-      redirectUrl ? `?redirectUrl=${encodeURIComponent(redirectUrl)}` : ""
+    `${to}${redirectUrl ? `?redirectUrl=${encodeURIComponent(redirectUrl)}` : ""
     }`
   );
 };
@@ -280,7 +280,7 @@ export const createGoogleOAuthUser = async (req: Request, res: Response) => {
     ...googleOAuthPayload,
     address,
     phone,
-    role: type === "agency" ? UserRoles.OWNER : UserRoles.USER,
+    role: type === "agency" ? UserRoles.Owner : UserRoles.User,
   });
 
   let entity;

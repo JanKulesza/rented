@@ -4,13 +4,14 @@ import mongoose from "mongoose";
 import {
   agencySchema,
   type AgencySchemaType,
-} from "../utils/schemas/agency.ts";
-import { UserRoles, userSchema } from "../utils/schemas/user.ts";
+} from "../schemas/agency.ts";
+import { userSchema } from "../schemas/user.ts";
 import User from "../models/user.ts";
 import Property from "../models/property.ts";
 import jwt from "jsonwebtoken";
 import { deleteImage, uploadImage } from "../utils/cloudinary.ts";
 import formatErrRes from "../utils/format-err-res.ts";
+import { UserRoles } from "../types/user.ts";
 
 // Return all agencies without populating the owner, properties, and agents fields. This is to avoid sending too much data to the client.
 export const getAgencies = async (req: Request, res: Response, next: NextFunction) => {
@@ -186,7 +187,7 @@ export const deleteAgency = async (
 
     await User.updateMany(
       { agency: agency._id },
-      { agency: null, role: UserRoles.USER, properties: [] },
+      { agency: null, role: UserRoles.User, properties: [] },
       {
         session,
       }
@@ -280,7 +281,7 @@ export const joinAgency = async (
   try {
     await agency.updateOne({ $push: { agents: user._id } }, { session });
     await user.updateOne(
-      { agency: agency._id, role: UserRoles.AGENT },
+      { agency: agency._id, role: UserRoles.Agent },
       { session }
     );
     await session.commitTransaction();

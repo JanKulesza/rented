@@ -1,8 +1,9 @@
 import { z } from "zod";
-import User from "../../models/user.ts";
+import User from "../models/user.ts";
 import mongoose from "mongoose";
-import Property from "../../models/property.ts";
-import { ACCEPTED_IMAGE_TYPES, addressSchema } from "./property.ts";
+import Property from "../models/property.ts";
+import { ACCEPTED_IMAGE_TYPES } from "./property.ts";
+import { detailedAddressSchema } from "./address.ts";
 
 export const agencySchema = z.object({
   name: z.string({ required_error: "Name is required." }).min(4).max(32),
@@ -12,7 +13,7 @@ export const agencySchema = z.object({
       message: "Invalid image file type",
     })
     .optional(),
-  address: addressSchema,
+  address: detailedAddressSchema,
   owner: z
     .string({ required_error: "Owner is required." })
     .refine(async (arg) => {
